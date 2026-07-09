@@ -51,6 +51,7 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
   min-height:42px;border-radius:13px;border:1px solid var(--line);color:var(--text);
   background:rgba(8,19,33,.82);padding:0 14px;outline:none
 }
+.store-select{min-width:230px;max-width:310px}
 .ghost{cursor:pointer;display:flex;align-items:center;gap:8px}
 .ghost:hover{border-color:rgba(89,228,255,.48);box-shadow:0 0 24px rgba(89,228,255,.08)}
 .statusline{
@@ -124,6 +125,30 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
 .marker{position:absolute;top:-5px;height:21px;width:2px;background:#fff;border-radius:3px;opacity:.85;box-shadow:0 0 6px #fff}
 .pulse-value{text-align:right;font-weight:850;font-size:13px}
 .pulse-sub{display:block;color:var(--muted);font-size:10px;font-weight:500;margin-top:2px}
+.forecast-card{padding:20px}
+.forecast-context{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;padding:8px 11px;border-radius:999px;
+  color:#cfeeff;background:rgba(89,228,255,.08);border:1px solid rgba(89,228,255,.14);font-size:12px
+}
+.forecast-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.forecast-kpi{
+  padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.026);
+  min-height:116px
+}
+.forecast-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.11em}
+.forecast-value{font-size:28px;font-weight:850;letter-spacing:-.045em;margin:11px 0 5px}
+.forecast-note{font-size:11px;color:var(--muted);line-height:1.35}
+.forecast-bars{display:grid;gap:12px;margin-top:18px}
+.forecast-row{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(230px,2fr) 108px;gap:13px;align-items:center;cursor:pointer}
+.forecast-name{font-size:13px;font-weight:760;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.forecast-track{height:12px;background:rgba(255,255,255,.06);border-radius:999px;position:relative;overflow:visible}
+.forecast-fill{height:100%;border-radius:999px;min-width:3px;background:linear-gradient(90deg,var(--blue),var(--cyan));box-shadow:0 0 17px rgba(89,228,255,.14)}
+.forecast-fill.good{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.forecast-fill.warn{background:linear-gradient(90deg,var(--amber),var(--cyan))}
+.forecast-fill.risk{background:linear-gradient(90deg,var(--red),var(--amber))}
+.forecast-marker{position:absolute;top:-5px;height:22px;width:2px;background:#fff;border-radius:3px;opacity:.86;box-shadow:0 0 6px #fff}
+.forecast-meta{text-align:right;font-weight:850;font-size:13px}
+.forecast-meta span{display:block;color:var(--muted);font-size:10px;font-weight:500;margin-top:2px}
 .details-toggle{margin-top:16px;text-align:center}
 .diagnostic{
   display:none;margin-top:14px;padding:14px 17px;border-radius:18px;border:1px solid var(--line);
@@ -167,18 +192,20 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
 .empty{padding:24px;text-align:center;color:var(--muted)}
 @media(max-width:860px){
   .shell{width:min(100% - 20px,720px);padding-top:15px}
-  .topbar{align-items:flex-start}.actions{flex-direction:column;align-items:stretch}.select,.ghost{width:170px}
+  .topbar{align-items:flex-start}.actions{flex-direction:column;align-items:stretch}.select,.ghost{width:230px;max-width:100%}
   .grid-hero{grid-template-columns:1fr}.hero{min-height:auto}
   .side-stack{grid-template-columns:1fr 1fr;grid-template-rows:auto}
   .priority-grid{grid-template-columns:1fr 1fr}.priority:nth-child(3){display:none}
+  .forecast-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:600px){
   .shell{width:calc(100% - 18px);padding-bottom:100px}
-  .topbar{display:block}.actions{margin-top:14px;display:grid;grid-template-columns:1fr 1fr}.select,.ghost{width:100%}
+  .topbar{display:block}.actions{margin-top:14px;display:grid;grid-template-columns:1fr 1fr}.select,.ghost{width:100%}.actions .ghost{grid-column:1/-1}
   .hero{grid-template-columns:1fr;padding:20px}.hero-copy{text-align:center}.money{font-size:43px}.ring{width:166px}.ring-number{font-size:34px}
   .insight{font-size:12px;text-align:left}.side-stack{grid-template-columns:1fr 1fr;gap:10px}.metric{padding:16px;min-height:122px}.metric-value{font-size:27px}.metric-foot{font-size:11px}
   .priority-grid{grid-template-columns:1fr}.priority:nth-child(3){display:none}.priority{min-height:168px}
-  .pulse-card{padding:16px}.pulse-row{grid-template-columns:1fr 64px;gap:7px 10px}.track{grid-column:1/-1;grid-row:2}.pulse-value{grid-column:2;grid-row:1}.pulse-name{grid-column:1}
+  .forecast-card,.pulse-card{padding:16px}.forecast-grid{grid-template-columns:1fr 1fr;gap:10px}.forecast-value{font-size:23px}
+  .pulse-row,.forecast-row{grid-template-columns:1fr 72px;gap:7px 10px}.track,.forecast-track{grid-column:1/-1;grid-row:2}.pulse-value,.forecast-meta{grid-column:2;grid-row:1}.pulse-name,.forecast-name{grid-column:1}
   .diagnostic{grid-template-columns:1fr 1fr}.mobile-nav{display:flex}
   .section-head{align-items:start}.section-head p{max-width:130px;text-align:right}
   .drawer{padding:17px}.drawer-kpis{grid-template-columns:1fr 1fr}
@@ -207,6 +234,7 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
     </div>
     <div class="actions">
       <select id="groupFilter" class="select" aria-label="Filtrar grupo"></select>
+      <select id="storeFilter" class="select store-select" aria-label="Filtrar tienda"></select>
       <button class="ghost" id="exploreBtn" type="button">⌕ Explorar tienda</button>
     </div>
   </header>
@@ -243,6 +271,39 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
       </div>
     </section>
 
+    <section id="proyeccion">
+      <div class="section-head">
+        <div><h2>Proyección contra meta</h2><p>Cómo cerraríamos el mes si se mantiene el ritmo actual.</p></div>
+        <p id="forecastSummary">Calculando escenario…</p>
+      </div>
+      <article class="card forecast-card">
+        <div class="forecast-context" id="forecastContext">Vista general</div>
+        <div class="forecast-grid">
+          <div class="forecast-kpi">
+            <div class="forecast-label">Proyección cierre</div>
+            <div class="forecast-value" id="forecastProjection">$0</div>
+            <div class="forecast-note">Venta estimada al día 31.</div>
+          </div>
+          <div class="forecast-kpi">
+            <div class="forecast-label">Cierre vs meta</div>
+            <div class="forecast-value" id="forecastPct">0%</div>
+            <div class="forecast-note" id="forecastPctNote">Cumplimiento proyectado.</div>
+          </div>
+          <div class="forecast-kpi">
+            <div class="forecast-label">Gap proyectado</div>
+            <div class="forecast-value" id="forecastGap">$0</div>
+            <div class="forecast-note">Diferencia estimada contra meta mensual.</div>
+          </div>
+          <div class="forecast-kpi">
+            <div class="forecast-label">Margen ponderado</div>
+            <div class="forecast-value" id="forecastMargin">0%</div>
+            <div class="forecast-note">Con el mix actual de venta.</div>
+          </div>
+        </div>
+        <div class="forecast-bars" id="forecastBars"></div>
+      </article>
+    </section>
+
     <section id="prioridades">
       <div class="section-head">
         <div><h2>Acción inmediata</h2><p>Las desviaciones con mayor impacto económico.</p></div>
@@ -273,6 +334,7 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
 
 <nav class="mobile-nav">
   <a href="#resumen">Resumen</a>
+  <a href="#proyeccion">Proy.</a>
   <a href="#prioridades">Prioridades</a>
   <a href="#grupos">Grupos</a>
 </nav>
@@ -296,10 +358,20 @@ const money = (n, compact=false) => {
 const pct = n => (n*100).toFixed(1)+"%";
 const groups = [...new Set(STORES.map(s=>s.group))].sort();
 const filter = $("#groupFilter");
+const storeFilter = $("#storeFilter");
 filter.innerHTML = `<option value="TODOS">Todos los grupos</option>` + groups.map(g=>`<option>${g}</option>`).join("");
 
-function subset(){
+function groupSubset(){
   return filter.value==="TODOS" ? STORES : STORES.filter(s=>s.group===filter.value);
+}
+function populateStores(keepSelection=true){
+  const arr=groupSubset().slice().sort((a,b)=>a.store.localeCompare(b.store));
+  const previous=keepSelection ? storeFilter.value : "TODAS";
+  storeFilter.innerHTML = `<option value="TODAS">Todas las tiendas</option>` + arr.map(s=>`<option value="${s.store}">${s.store}</option>`).join("");
+  storeFilter.value = arr.some(s=>s.store===previous) ? previous : "TODAS";
+}
+function subset(){
+  return storeFilter.value==="TODAS" ? groupSubset() : STORES.filter(s=>s.store===storeFilter.value);
 }
 function sum(arr,key){return arr.reduce((a,b)=>a+b[key],0)}
 function calc(arr){
@@ -309,13 +381,29 @@ function calc(arr){
     goal,sales,tickets,progress:sales/goal,expectedSales:goal*EXPECTED,
     breach:sales-goal*EXPECTED, currentDaily:sales/DAYS_ELAPSED,
     neededDaily:(goal-sales)/DAYS_LEFT, projection:sales/DAYS_ELAPSED*DAYS_MONTH,
-    avgTicket:tickets?sales/tickets:0, margin:sales?marginValue/sales*100:0
+    avgTicket:tickets?sales/tickets:0, margin:sales?marginValue/sales*100:0,
+    projectionPct:goal ? (sales/DAYS_ELAPSED*DAYS_MONTH)/goal : 0
   };
 }
 function statusClass(diff){
   if(diff>=0) return "pos";
   if(diff>=-.02) return "warn";
   return "neg";
+}
+function forecastClass(vsMeta){
+  if(vsMeta>=1) return "pos";
+  if(vsMeta>=.95) return "warn";
+  return "neg";
+}
+function barClass(vsMeta){
+  if(vsMeta>=1) return "good";
+  if(vsMeta>=.95) return "warn";
+  return "risk";
+}
+function scopeLabel(){
+  if(storeFilter.value!=="TODAS") return `Tienda seleccionada · ${storeFilter.value}`;
+  if(filter.value!=="TODOS") return `Grupo seleccionado · ${filter.value}`;
+  return "Vista general · todos los grupos";
 }
 function render(){
   const arr=subset(), c=calc(arr), diff=c.progress-EXPECTED;
@@ -347,6 +435,7 @@ function render(){
     ? `${pct(increment)} arriba del promedio actual`
     : `El promedio actual ya cubre la meta`;
 
+  renderProjection(arr,c);
   renderPriorities(arr);
   renderPulse();
   $("#diagTickets").textContent=c.tickets.toLocaleString("es-MX");
@@ -359,8 +448,70 @@ function storeMetrics(s){
     ...s, progress, breach,
     neededDaily:(s.goal-s.sales)/DAYS_LEFT,
     currentDaily:s.sales/DAYS_ELAPSED,
-    projection:s.sales/DAYS_ELAPSED*DAYS_MONTH
+    projection:s.sales/DAYS_ELAPSED*DAYS_MONTH,
+    projectionPct:s.goal ? (s.sales/DAYS_ELAPSED*DAYS_MONTH)/s.goal : 0,
+    projectionGap:s.sales/DAYS_ELAPSED*DAYS_MONTH-s.goal
   };
+}
+function projectionRows(arr){
+  if(storeFilter.value!=="TODAS" && arr.length){
+    const s=storeMetrics(arr[0]);
+    return s.channels
+      .map(ch=>{
+        const projected=ch.sales/DAYS_ELAPSED*DAYS_MONTH;
+        return {
+          name:ch.name,
+          pct:s.goal ? projected/s.goal : 0,
+          amount:projected,
+          note:`${pct(s.sales?ch.sales/s.sales:0)} del mix actual`,
+          isChannel:true
+        };
+      })
+      .sort((a,b)=>b.pct-a.pct);
+  }
+  if(filter.value!=="TODOS"){
+    return arr.map(storeMetrics)
+      .map(s=>({name:s.store,pct:s.projectionPct,amount:s.projectionGap,note:`Meta ${money(s.goal,true)}`,isChannel:false,store:s.store}))
+      .sort((a,b)=>a.pct-b.pct);
+  }
+  return groupMetrics()
+    .map(g=>({name:g.group,pct:g.projectionPct,amount:g.projection-g.goal,note:`Meta ${money(g.goal,true)}`,isChannel:false,group:g.group}))
+    .sort((a,b)=>a.pct-b.pct);
+}
+function renderProjection(arr,c){
+  const projected=c.projection, vsMeta=c.goal ? projected/c.goal : 0, gap=projected-c.goal;
+  const diff=vsMeta-1;
+  $("#forecastContext").textContent=scopeLabel();
+  $("#forecastProjection").textContent=money(projected,true);
+  $("#forecastPct").textContent=pct(vsMeta);
+  $("#forecastPct").className="forecast-value "+forecastClass(vsMeta);
+  $("#forecastGap").textContent=money(gap,true);
+  $("#forecastGap").className="forecast-value "+forecastClass(vsMeta);
+  $("#forecastMargin").textContent=c.margin.toFixed(2)+"%";
+  $("#forecastSummary").textContent=diff>=0
+    ? `Cierre estimado ${pct(diff)} arriba de meta`
+    : `Cierre estimado ${pct(Math.abs(diff))} debajo de meta`;
+  $("#forecastPctNote").textContent=diff>=0
+    ? `Sobrarían ${money(gap,true)} contra la meta.`
+    : `Faltarían ${money(Math.abs(gap),true)} contra la meta.`;
+
+  const rows=projectionRows(arr).slice(0, storeFilter.value!=="TODAS" ? 8 : 10);
+  const maxPct=Math.max(1.08,...rows.map(r=>r.pct))*1.04;
+  $("#forecastBars").innerHTML=rows.map(r=>{
+    const click = r.store ? `onclick='openStore(${JSON.stringify(r.store)})'` : r.group ? `onclick='selectGroup(${JSON.stringify(r.group)})'` : "";
+    const amountLabel = r.isChannel ? `Proy. ${money(r.amount,true)}` : `${r.amount>=0?"+":""}${money(r.amount,true)}`;
+    const metaText = r.isChannel ? "vs meta tienda" : "vs meta";
+    return `<div class="forecast-row" ${click}>
+      <div class="forecast-name">${r.name}</div>
+      <div class="forecast-track">
+        <div class="forecast-fill ${barClass(r.pct)}" style="width:${Math.min(r.pct/maxPct*100,100)}%"></div>
+        <div class="forecast-marker" style="left:${Math.min(1/maxPct*100,100)}%"></div>
+      </div>
+      <div class="forecast-meta ${forecastClass(r.pct)}">${pct(r.pct)}
+        <span>${amountLabel} · ${metaText}</span>
+      </div>
+    </div>`;
+  }).join("") || `<div class="empty">No hay datos para proyectar.</div>`;
 }
 function renderPriorities(arr){
   const p=arr.map(storeMetrics).filter(x=>x.breach<0).sort((a,b)=>a.breach-b.breach).slice(0,3);
@@ -401,7 +552,7 @@ function renderPulse(){
     </div>`;
   }).join("");
 }
-function selectGroup(g){filter.value=g;render();window.scrollTo({top:0,behavior:"smooth"})}
+function selectGroup(g){filter.value=g;populateStores(false);render();window.scrollTo({top:0,behavior:"smooth"})}
 function openStore(name){
   const s=storeMetrics(STORES.find(x=>x.store===name));
   const diff=s.progress-EXPECTED;
@@ -425,6 +576,8 @@ function openStore(name){
       <div class="dk"><small>Brecha al corte</small><strong class="${statusClass(diff)}">${money(s.breach,true)}</strong></div>
       <div class="dk"><small>Ritmo necesario</small><strong>${money(s.neededDaily,true)}/día</strong></div>
       <div class="dk"><small>Proyección cierre</small><strong>${money(s.projection,true)}</strong></div>
+      <div class="dk"><small>Cierre vs meta</small><strong class="${forecastClass(s.projectionPct)}">${pct(s.projectionPct)}</strong></div>
+      <div class="dk"><small>Gap proyectado</small><strong class="${forecastClass(s.projectionPct)}">${money(s.projectionGap,true)}</strong></div>
       <div class="dk"><small>Ticket promedio</small><strong>${money(s.avgTicket)}</strong></div>
       <div class="dk"><small>Tickets</small><strong>${s.tickets.toLocaleString("es-MX")}</strong></div>
       <div class="dk"><small>Margen</small><strong>${s.margin.toFixed(2)}%</strong></div>
@@ -432,13 +585,17 @@ function openStore(name){
     <div class="action-box"><b>Lectura operativa:</b><br>${action}</div>
     ${s.channels.length>1?`
       <div class="channel-title">Composición por canal</div>
-      ${s.channels.map(c=>`<div class="channel"><div><b>${c.name}</b><br><span>${c.tickets.toLocaleString("es-MX")} tickets · margen ${c.margin.toFixed(2)}%</span></div><b>${money(c.sales,true)}</b></div>`).join("")}
+      ${s.channels.map(c=>{
+        const cp=c.sales/DAYS_ELAPSED*DAYS_MONTH;
+        const cpct=s.goal ? cp/s.goal : 0;
+        return `<div class="channel"><div><b>${c.name}</b><br><span>${c.tickets.toLocaleString("es-MX")} tickets · margen ${c.margin.toFixed(2)}% · cierre ${pct(cpct)} meta tienda</span></div><b>${money(cp,true)}</b></div>`;
+      }).join("")}
     `:""}
   `;
   $("#overlay").classList.add("open");
 }
 function openExplorer(){
-  const arr=subset().slice().sort((a,b)=>a.store.localeCompare(b.store));
+  const arr=groupSubset().slice().sort((a,b)=>a.store.localeCompare(b.store));
   $("#drawer").innerHTML=`
     <div class="drawer-head">
       <div><div class="drawer-group">Explorador</div><h3>Selecciona una tienda</h3></div>
@@ -452,14 +609,15 @@ function openExplorer(){
     const r=arr.filter(s=>s.store.toLowerCase().includes(q));
     list.innerHTML=r.map(s=>{
       const m=storeMetrics(s);
-      return `<div class="store-option" onclick='openStore(${JSON.stringify(s.store)})'><b>${s.store}</b><span>${s.group} · avance ${pct(m.progress)} · brecha ${money(m.breach,true)}</span></div>`
+      return `<div class="store-option" onclick='openStore(${JSON.stringify(s.store)})'><b>${s.store}</b><span>${s.group} · avance ${pct(m.progress)} · cierre ${pct(m.projectionPct)} meta · gap ${money(m.projectionGap,true)}</span></div>`
     }).join("") || `<div class="empty">No se encontraron tiendas.</div>`;
   }
   input.addEventListener("input",paint);paint();
   $("#overlay").classList.add("open");setTimeout(()=>input.focus(),80);
 }
 function closeDrawer(){ $("#overlay").classList.remove("open") }
-filter.addEventListener("change",render);
+filter.addEventListener("change",()=>{populateStores(false);render();});
+storeFilter.addEventListener("change",render);
 $("#exploreBtn").addEventListener("click",openExplorer);
 $("#overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeDrawer()});
 $("#diagToggle").addEventListener("click",()=>{
@@ -467,6 +625,7 @@ $("#diagToggle").addEventListener("click",()=>{
   $("#diagToggle").textContent=$("#diagnostic").classList.contains("show")?"Ocultar diagnóstico":"Ver diagnóstico comercial";
 });
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer()});
+populateStores(false);
 render();
 </script>
 </body>
