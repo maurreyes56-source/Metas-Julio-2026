@@ -214,9 +214,66 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
   .side-stack{grid-template-columns:1fr}.actions{grid-template-columns:1fr}
   .priority-bottom{font-size:11px}
 }
+
+body:not(.app-ready) .shell, body:not(.app-ready) .mobile-nav{display:none}
+.login-layer{
+  position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
+  padding:18px; background:
+    radial-gradient(circle at 20% 15%, rgba(89,228,255,.18), transparent 28%),
+    radial-gradient(circle at 80% 80%, rgba(74,242,161,.10), transparent 30%),
+    rgba(5,11,20,.94);
+}
+body.app-ready .login-layer{display:none}
+.login-card{
+  width:min(440px,100%); border:1px solid rgba(143,190,255,.18); border-radius:28px;
+  background:linear-gradient(145deg,rgba(17,36,59,.92),rgba(7,17,31,.90));
+  box-shadow:0 30px 90px rgba(0,0,0,.50); backdrop-filter:blur(22px); padding:26px;
+}
+.login-card h2{margin:8px 0 6px;font-size:26px;letter-spacing:-.03em}
+.login-card p{margin:0 0 20px;color:var(--muted);font-size:13px;line-height:1.45}
+.login-field{display:grid;gap:7px;margin-bottom:13px}
+.login-field label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800}
+.login-field input{
+  height:48px;border-radius:15px;border:1px solid var(--line);background:rgba(255,255,255,.045);
+  color:var(--text);padding:0 14px;outline:none
+}
+.login-field input:focus{border-color:rgba(89,228,255,.46);box-shadow:0 0 26px rgba(89,228,255,.08)}
+.login-btn{
+  width:100%;height:48px;border:0;border-radius:16px;cursor:pointer;color:#06101d;font-weight:900;
+  background:linear-gradient(135deg,var(--cyan),var(--green));box-shadow:0 18px 50px rgba(89,228,255,.16)
+}
+.login-error{min-height:20px;margin-top:12px;color:#ffb7c3;font-size:12px;text-align:center}
+.login-note{margin-top:14px;padding:11px 12px;border-radius:14px;background:rgba(255,201,92,.08);border:1px solid rgba(255,201,92,.14);color:#ffe9ba;font-size:11px;line-height:1.35}
+.user-pill{
+  min-height:42px;border-radius:13px;border:1px solid var(--line);color:var(--text);
+  background:rgba(8,19,33,.82);padding:0 12px;display:flex;align-items:center;font-size:12px;color:var(--muted)
+}
+
 </style>
 </head>
 <body>
+
+<div class="login-layer" id="loginLayer">
+  <div class="login-card">
+    <div class="eyebrow">Acceso comercial</div>
+    <h2>Seguimiento de metas</h2>
+    <p>Ingresa con el usuario asignado. Dirección ve la vista general; cada supervisor ve únicamente sus tiendas.</p>
+    <form id="loginForm" autocomplete="off">
+      <div class="login-field">
+        <label for="loginUser">Usuario</label>
+        <input id="loginUser" name="loginUser" placeholder="ej. omar" required>
+      </div>
+      <div class="login-field">
+        <label for="loginPass">Contraseña</label>
+        <input id="loginPass" name="loginPass" type="password" placeholder="Contraseña" required>
+      </div>
+      <button class="login-btn" type="submit">Entrar al dashboard</button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+    <div class="login-note">Control visual para operación interna. Para seguridad fuerte se recomienda Supabase Auth + permisos por fila.</div>
+  </div>
+</div>
+
 <div class="shell">
   <header class="topbar">
     <div class="brand">
@@ -235,7 +292,9 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
     <div class="actions">
       <select id="groupFilter" class="select" aria-label="Filtrar grupo"></select>
       <select id="storeFilter" class="select store-select" aria-label="Filtrar tienda"></select>
+      <div class="user-pill" id="userPill">Sin sesión</div>
       <button class="ghost" id="exploreBtn" type="button">⌕ Explorar tienda</button>
+      <button class="ghost" id="logoutBtn" type="button">Salir</button>
     </div>
   </header>
 
@@ -356,10 +415,63 @@ const money = (n, compact=false) => {
   return sign+a.toLocaleString("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0});
 };
 const pct = n => (n*100).toFixed(1)+"%";
-const groups = [...new Set(STORES.map(s=>s.group))].sort();
+let groups = [];
+let CURRENT_USER = null;
+const ALL_STORES = JSON.parse(JSON.stringify(STORES));
+const SUPERVISOR_BY_STORE = {"VIGS CACAHUATEPEC":"Omar","VIGS MENUDEO":"Omar","VIGS HACIENDA":"Omar","COMERCIAL MENUDEO":"Omar","VIGS PLAZA MERCADO":"Alicia","VIGS SAN ANTONIO":"Omar","VIGS ALBOMONCI":"Omar","VIGS PUERTO I":"Erick","VIGS JAMILTEPEC":"Omar","VIGS CUAJI":"Omar","VIGS MARQUELIA":"Omar","VIGS PUERTO II":"Erick","VIGS TONAMECA":"Erick","VIGS CENTRAL":"Omar","VIGS GAVIOTAS":"Omar","VIGS ALVARO CARRILLO":"Omar","VIGS LIBRAMIENTO":"Omar","VIGS AVENIDA JUAREZ":"Omar","VIGS CBTA":"Omar","VIGS ZICATELA":"Erick","VIGS BOULEVARD":"Erick","VIGS BASICO OMETEPEC":"Alicia","VIGS BASICO JAMILTEPEC":"Alicia","VIGS PUERTO MERCADO":"Erick","VIGS PUERTO CENTRAL":"Erick","VIGS RIO GRANDE":"Erick","VIGS BASICO CUAJI":"Alicia","VIGS 5 DE MAYO":"Omar","VIGS CENTRO PINOTEPA":"Omar","VIGS PUERTO ADOQUIN":"Erick","VIGS BASICO PUERTO ESCONDIDO":"Alicia","VIGS MOVIL 001":"Erick","VIGS SAN JOSE DEL PROGRESO":"Omar","VIGS MOVIL 002":"Omar","VIGS GRANJAS DEL PESCADOR":"Erick"};
+const USERS = {
+  "ventas": { password:"ventas", name:"Dirección de Ventas", role:"director", supervisor:"TODOS" },
+  "omar": { password:"omar26", name:"Omar", role:"supervisor", supervisor:"Omar" },
+  "alicia": { password:"ali26", name:"Alicia", role:"supervisor", supervisor:"Alicia" },
+  "erick": { password:"eri26", name:"Erick", role:"supervisor", supervisor:"Erick" }
+};
 const filter = $("#groupFilter");
 const storeFilter = $("#storeFilter");
-filter.innerHTML = `<option value="TODOS">Todos los grupos</option>` + groups.map(g=>`<option>${g}</option>`).join("");
+function refreshGroupFilter(){
+  groups = [...new Set(STORES.map(s=>s.group).filter(Boolean))].sort();
+  filter.innerHTML = `<option value="TODOS">Todos los grupos</option>` + groups.map(g=>`<option>${g}</option>`).join("");
+  filter.value = "TODOS";
+}
+
+
+function normalizeLogin(v){ return String(v || "").trim().toLowerCase(); }
+function applyLogin(username){
+  const user = USERS[username];
+  CURRENT_USER = { username, ...user };
+  const allowed = user.role === "director"
+    ? ALL_STORES
+    : ALL_STORES.filter(s => SUPERVISOR_BY_STORE[s.store] === user.supervisor);
+  STORES.splice(0, STORES.length, ...JSON.parse(JSON.stringify(allowed)));
+  refreshGroupFilter();
+  populateStores(false);
+  document.body.classList.add("app-ready");
+  $("#userPill").textContent = user.role === "director" ? "Vista dirección" : `Vista ${user.name}`;
+  const scopeText = user.role === "director"
+    ? "Corte acumulado al 09 de julio de 2026 · Vista general dirección"
+    : `Corte acumulado al 09 de julio de 2026 · Supervisor ${user.name}`;
+  document.querySelector(".statusline").innerHTML = `<span class="dot"></span>${scopeText}`;
+  render();
+}
+function initLogin(){
+  const saved = sessionStorage.getItem("metasDashboardUser");
+  if(saved && USERS[saved]){ applyLogin(saved); return; }
+  $("#loginForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const username = normalizeLogin($("#loginUser").value);
+    const password = String($("#loginPass").value || "").trim();
+    if(!USERS[username] || USERS[username].password !== password){
+      $("#loginError").textContent = "Usuario o contraseña incorrectos.";
+      return;
+    }
+    sessionStorage.setItem("metasDashboardUser", username);
+    applyLogin(username);
+  });
+  setTimeout(()=>$("#loginUser").focus(),80);
+}
+function logout(){
+  sessionStorage.removeItem("metasDashboardUser");
+  location.reload();
+}
 
 function groupSubset(){
   return filter.value==="TODOS" ? STORES : STORES.filter(s=>s.group===filter.value);
@@ -619,14 +731,14 @@ function closeDrawer(){ $("#overlay").classList.remove("open") }
 filter.addEventListener("change",()=>{populateStores(false);render();});
 storeFilter.addEventListener("change",render);
 $("#exploreBtn").addEventListener("click",openExplorer);
+$("#logoutBtn").addEventListener("click",logout);
 $("#overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeDrawer()});
 $("#diagToggle").addEventListener("click",()=>{
   $("#diagnostic").classList.toggle("show");
   $("#diagToggle").textContent=$("#diagnostic").classList.contains("show")?"Ocultar diagnóstico":"Ver diagnóstico comercial";
 });
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer()});
-populateStores(false);
-render();
+initLogin();
 </script>
 </body>
 </html>
