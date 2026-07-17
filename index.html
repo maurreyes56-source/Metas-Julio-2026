@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Metas Vig's">
+<meta name="format-detection" content="telephone=no">
+<meta name="dashboard-build" content="2026.07.17.4.1">
 <title>Seguimiento de Metas | Julio 2026</title>
 <style>
 :root{
@@ -11,6 +17,7 @@
   --line:rgba(143,190,255,.14); --text:#eff7ff; --muted:#8fa8bf;
   --cyan:#59e4ff; --blue:#6a8dff; --green:#4af2a1; --amber:#ffc95c; --red:#ff657d;
   --shadow:0 20px 60px rgba(0,0,0,.36);
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -22,7 +29,7 @@ body{
     radial-gradient(circle at 88% 18%, rgba(0,225,255,.12), transparent 27%),
     radial-gradient(circle at 50% 105%, rgba(53,241,163,.09), transparent 35%),
     var(--bg);
-  overflow-x:hidden;
+  overflow-x:hidden;overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;
 }
 body:before{
   content:""; position:fixed; inset:0; pointer-events:none; opacity:.22;
@@ -31,7 +38,8 @@ body:before{
   background-size:32px 32px;
   mask-image:linear-gradient(to bottom,black,transparent 78%);
 }
-button,select,input{font:inherit}
+button,select,input{font:inherit;touch-action:manipulation}
+.shell main>section{scroll-margin-top:132px}
 .shell{width:min(1220px,calc(100% - 30px));margin:auto;padding:24px 0 92px}
 .topbar{
   display:flex; align-items:center; justify-content:space-between; gap:18px;
@@ -60,11 +68,23 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
   display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin-top:7px
 }
 .dot{width:7px;height:7px;border-radius:99px;background:var(--green);box-shadow:0 0 14px var(--green)}
+.section-nav{
+  position:sticky;top:10px;z-index:29;width:max-content;max-width:100%;display:flex;gap:5px;
+  margin:0 0 18px auto;padding:5px;border:1px solid rgba(143,190,255,.16);border-radius:18px;
+  background:rgba(7,17,31,.82);backdrop-filter:blur(22px);box-shadow:0 14px 42px rgba(0,0,0,.24)
+}
+.section-nav a{
+  min-height:38px;display:flex;align-items:center;gap:7px;padding:0 12px;border-radius:13px;
+  color:var(--muted);text-decoration:none;font-size:11px;font-weight:760;transition:.2s ease
+}
+.section-nav a:hover{color:var(--text);background:rgba(255,255,255,.045)}
+.section-nav a.active{color:#eaffff;background:linear-gradient(145deg,rgba(89,228,255,.15),rgba(106,141,255,.12));box-shadow:inset 0 0 0 1px rgba(89,228,255,.12)}
+.section-nav a.active span{color:var(--cyan)}
 .grid-hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:16px}
 .card{
   position:relative;overflow:hidden;border:1px solid var(--line);border-radius:24px;
   background:linear-gradient(145deg,rgba(17,36,59,.88),rgba(7,17,31,.78));
-  box-shadow:var(--shadow);backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);backdrop-filter:blur(18px);transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease;
 }
 .card:after{
   content:"";position:absolute;inset:auto -25% -60% 25%;height:140px;
@@ -79,6 +99,21 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
   background:rgba(255,101,125,.09);border:1px solid rgba(255,101,125,.18);color:#ffd8df;font-size:13px
 }
 .insight.good{background:rgba(74,242,161,.09);border-color:rgba(74,242,161,.19);color:#caffdf}
+.hero-forecast{
+  width:100%;margin-top:13px;padding:14px 15px;border:1px solid rgba(89,228,255,.22);border-radius:18px;
+  color:var(--text);background:linear-gradient(135deg,rgba(34,92,155,.34),rgba(25,170,157,.13));
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;text-align:left;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 12px 30px rgba(0,0,0,.16);transition:.22s ease;
+}
+.hero-forecast:hover{transform:translateY(-2px);border-color:rgba(89,228,255,.44);box-shadow:0 16px 38px rgba(0,0,0,.24),0 0 24px rgba(89,228,255,.07)}
+.hero-forecast:active{transform:scale(.985)}
+.hero-forecast-label{display:block;color:#cdeeff;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.hero-forecast-value{display:block;font-size:24px;font-weight:880;letter-spacing:-.04em;margin-top:4px}
+.hero-forecast-scope{display:block;color:var(--muted);font-size:10px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-forecast-result{align-self:center;text-align:right;padding-left:12px;border-left:1px solid rgba(255,255,255,.10)}
+.hero-forecast-result strong{display:block;font-size:21px;font-weight:880;letter-spacing:-.03em}
+.hero-forecast-result span{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.hero-forecast-link{grid-column:1/-1;color:var(--cyan);font-size:10px;font-weight:760;letter-spacing:.04em}
 .ring{
   --p:20;--c:var(--cyan);width:190px;aspect-ratio:1;border-radius:50%;position:relative;
   display:grid;place-items:center;margin:auto;
@@ -120,7 +155,9 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
 .pulse-card{padding:20px}
 .pulse-list{display:grid;gap:15px}
 .pulse-row{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(220px,2.2fr) 90px;gap:14px;align-items:center;cursor:pointer}
-.pulse-name{font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pulse-name{font-size:13px;min-width:0}
+.pulse-name b{display:block;font-weight:780;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pulse-detail{display:block;color:var(--muted);font-size:10px;font-weight:520;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track{height:11px;background:rgba(255,255,255,.06);border-radius:999px;position:relative;overflow:visible}
 .fill{height:100%;border-radius:999px;min-width:3px;background:linear-gradient(90deg,var(--blue),var(--cyan));box-shadow:0 0 17px rgba(89,228,255,.16)}
 .fill.risk{background:linear-gradient(90deg,#f25570,var(--amber));box-shadow:0 0 17px rgba(255,101,125,.12)}
@@ -132,10 +169,23 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
   display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;padding:8px 11px;border-radius:999px;
   color:#cfeeff;background:rgba(89,228,255,.08);border:1px solid rgba(89,228,255,.14);font-size:12px
 }
-.forecast-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.forecast-spotlight{
+  position:relative;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(240px,.65fr);gap:12px;
+  padding:22px;border:1px solid rgba(89,228,255,.20);border-radius:22px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(35,95,163,.30),rgba(29,207,169,.10) 58%,rgba(7,17,31,.28));
+}
+.forecast-spotlight:after{content:"";position:absolute;width:260px;height:260px;right:-110px;top:-150px;border-radius:50%;background:radial-gradient(circle,rgba(89,228,255,.22),transparent 66%);pointer-events:none}
+.forecast-primary,.forecast-result{position:relative;z-index:1}
+.forecast-primary .forecast-value{font-size:clamp(38px,5vw,56px);margin:9px 0 4px}
+.forecast-primary .forecast-note{font-size:12px}
+.forecast-result{padding:17px;border:1px solid rgba(255,255,255,.10);border-radius:18px;background:rgba(4,13,24,.34);display:flex;flex-direction:column;justify-content:center}
+.forecast-result .forecast-value{font-size:clamp(31px,4vw,43px);margin:9px 0 5px}
+.forecast-result-badge{display:inline-flex;align-items:center;gap:7px;color:#cdeeff;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.forecast-result-badge:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.forecast-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
 .forecast-kpi{
   padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.026);
-  min-height:116px
+  min-height:112px
 }
 .forecast-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.11em}
 .forecast-value{font-size:28px;font-weight:850;letter-spacing:-.045em;margin:11px 0 5px}
@@ -159,14 +209,19 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
 .diagnostic.show{display:grid}
 .diag-item{text-align:center}.diag-value{font-size:18px;font-weight:800}.diag-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
 .mobile-nav{
-  display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:20;
-  background:rgba(7,17,31,.88);border:1px solid var(--line);border-radius:18px;
-  backdrop-filter:blur(20px);box-shadow:var(--shadow);padding:6px
+  display:none;position:fixed;left:8px;right:8px;bottom:calc(8px + var(--safe-bottom));z-index:40;
+  background:rgba(7,17,31,.91);border:1px solid rgba(143,190,255,.18);border-radius:22px;
+  backdrop-filter:blur(24px);box-shadow:0 18px 55px rgba(0,0,0,.52);padding:6px
 }
-.mobile-nav a{flex:1;text-align:center;color:var(--muted);text-decoration:none;font-size:11px;padding:9px 4px;border-radius:12px}
-.mobile-nav a:active{background:rgba(89,228,255,.08);color:var(--cyan)}
+.mobile-nav a,.mobile-nav button{flex:1;min-width:0;min-height:52px;border:0;text-align:center;color:var(--muted);text-decoration:none;background:transparent;font-size:9px;font-weight:720;padding:6px 2px;border-radius:16px;cursor:pointer;transition:.2s ease}
+.mobile-nav .nav-icon{display:grid;place-items:center;height:22px;font-size:19px;line-height:1;margin-bottom:2px;transition:.2s ease}
+.mobile-nav .nav-label{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mobile-nav a.active,.mobile-nav button.active{background:linear-gradient(145deg,rgba(89,228,255,.16),rgba(106,141,255,.13));color:#eafaff;box-shadow:inset 0 0 0 1px rgba(89,228,255,.12)}
+.mobile-nav a.active .nav-icon,.mobile-nav button.active .nav-icon{color:var(--cyan);transform:translateY(-1px)}
+.mobile-nav a:active,.mobile-nav button:active{transform:scale(.94)}
 .overlay{position:fixed;inset:0;background:rgba(1,6,12,.72);backdrop-filter:blur(8px);z-index:50;display:none;align-items:stretch;justify-content:flex-end}
 .overlay.open{display:flex}
+body.drawer-open{overflow:hidden}
 .drawer{
   width:min(520px,100%);height:100%;background:#081321;border-left:1px solid var(--line);
   padding:22px;overflow:auto;box-shadow:-20px 0 80px rgba(0,0,0,.5);animation:slide .25s ease
@@ -184,40 +239,74 @@ h1{font-size:clamp(20px,3vw,30px);line-height:1.05;margin:4px 0 0}
 .dk strong{display:block;font-size:19px;margin-top:6px}.dk small{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.09em}
 .action-box{margin-top:14px;padding:16px;border-radius:17px;background:rgba(255,201,92,.08);border:1px solid rgba(255,201,92,.18);font-size:13px;line-height:1.5;color:#ffe9ba}
 .channel-title{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:24px 0 10px}
+.channel-caption{font-size:11px;color:var(--muted);line-height:1.45;margin:-3px 0 8px}
 .channel{padding:12px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:8px}
 .channel b{font-size:13px}.channel span{font-size:12px;color:var(--muted)}
+.target-list{display:grid;gap:10px;margin-top:11px}
+.target-channel{padding:15px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.026)}
+.target-channel-head{display:flex;justify-content:space-between;align-items:start;gap:12px}
+.target-channel-name{font-size:13px;font-weight:820}.target-channel-sub{margin-top:3px;color:var(--muted);font-size:10px}.target-share{flex:0 0 auto;padding:5px 8px;border-radius:999px;background:rgba(89,228,255,.09);border:1px solid rgba(89,228,255,.15);color:#ccefff;font-size:10px;font-weight:800}
+.target-channel-progress{height:8px;margin:12px 0;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+.target-channel-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.target-channel-progress span.met{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.target-channel-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.target-channel-metrics small{display:block;color:var(--muted);font-size:9px;line-height:1.25}.target-channel-metrics strong{display:block;margin-top:4px;font-size:12px;line-height:1.25}
+.target-note{margin-top:11px;padding:12px 13px;border-radius:15px;background:rgba(255,201,92,.07);border:1px solid rgba(255,201,92,.15);color:#ffe4a7;font-size:11px;line-height:1.45}
+.target-source{display:inline-flex;align-items:center;gap:6px;margin-left:7px;color:var(--cyan);font-size:10px;font-weight:760;letter-spacing:0;text-transform:none}
+.target-source:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(74,242,161,.7)}
 .searchbox{width:100%;height:45px;margin:18px 0 10px;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:14px;color:#fff;padding:0 14px;outline:none}
 .store-list{display:grid;gap:8px}
 .store-option{padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);cursor:pointer}
 .store-option:hover{border-color:rgba(89,228,255,.3)}
 .store-option b{display:block;font-size:13px}.store-option span{font-size:11px;color:var(--muted)}
 .empty{padding:24px;text-align:center;color:var(--muted)}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+body.motion-ready main>section{opacity:0;transform:translateY(14px)}
+body.motion-ready main>section.in-view{opacity:1;transform:none;transition:opacity .42s ease,transform .42s cubic-bezier(.2,.8,.2,1)}
+body.view-updating main{opacity:.78;transform:translateY(2px);transition:opacity .12s ease,transform .12s ease}
 @media(max-width:860px){
+  .section-nav{display:none}
   .control-wrap{width:230px;max-width:100%}
   .shell{width:min(100% - 20px,720px);padding-top:15px}
   .topbar{align-items:flex-start}.actions{flex-direction:column;align-items:stretch}.select,.ghost{width:230px;max-width:100%}
   .grid-hero{grid-template-columns:1fr}.hero{min-height:auto}
   .side-stack{grid-template-columns:1fr 1fr;grid-template-rows:auto}
   .priority-grid{grid-template-columns:1fr 1fr}.priority:nth-child(3){display:none}
-  .forecast-grid{grid-template-columns:repeat(2,1fr)}
+  .forecast-spotlight{grid-template-columns:1.2fr .8fr}
 }
 @media(max-width:600px){
-  .control-wrap{width:100%}
-  .shell{width:calc(100% - 18px);padding-bottom:100px}
-  .topbar{display:block}.actions{margin-top:14px;display:grid;grid-template-columns:1fr 1fr}.select,.ghost{width:100%}.actions .ghost{grid-column:1/-1}
-  .hero{grid-template-columns:1fr;padding:20px}.hero-copy{text-align:center}.money{font-size:43px}.ring{width:166px}.ring-number{font-size:34px}
-  .insight{font-size:12px;text-align:left}.side-stack{grid-template-columns:1fr 1fr;gap:10px}.metric{padding:16px;min-height:122px}.metric-value{font-size:27px}.metric-foot{font-size:11px}
+  body{background:radial-gradient(circle at 50% -5%,rgba(40,108,255,.19),transparent 30%),var(--bg)}
+  .shell{width:calc(100% - 16px);padding:0 0 calc(92px + var(--safe-bottom))}
+  .shell main>section{scroll-margin-top:142px}
+  .topbar{position:sticky;top:0;z-index:30;display:block;margin:0 -8px 14px;padding:calc(10px + var(--safe-top)) 8px 10px;background:linear-gradient(to bottom,rgba(5,11,20,.97),rgba(5,11,20,.91) 80%,rgba(5,11,20,.76));backdrop-filter:blur(22px);border-bottom:1px solid rgba(143,190,255,.10)}
+  .brand{gap:10px;padding:0 3px}.logo{width:38px;height:38px;border-radius:12px}.logo svg{width:22px}.eyebrow{font-size:9px}h1{font-size:19px;margin-top:2px}.statusline{font-size:10px;margin-top:4px}
+  .actions{margin-top:10px;display:flex;flex-direction:row;align-items:end;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:1px 3px 5px;scrollbar-width:none}
+  .actions::-webkit-scrollbar{display:none}.control-wrap{width:auto;flex:0 0 172px;scroll-snap-align:start}.control-wrap:has(.store-select){flex-basis:228px}
+  .control-wrap label{font-size:8px}.select,.ghost{width:100%;min-height:42px;border-radius:14px;background:rgba(12,27,45,.94)}.store-select{min-width:0;max-width:none}
+  .user-pill{display:none}.actions .ghost{flex:0 0 auto;width:auto;white-space:nowrap;padding:0 13px}.actions #logoutBtn{min-width:60px;justify-content:center}
+  .grid-hero{gap:10px}.card{border-radius:21px}.hero{grid-template-columns:1fr;padding:19px;gap:18px}.hero-copy{text-align:left}.money{font-size:45px;margin-top:8px}.ring{width:158px}.ring-number{font-size:33px}
+  .insight{width:100%;font-size:12px;text-align:left;margin-top:15px}.hero-forecast{margin-top:10px;padding:13px 14px}.hero-forecast-value{font-size:23px}.hero-forecast-result strong{font-size:20px}
+  .side-stack{grid-template-columns:1fr 1fr;gap:9px}.metric{padding:15px;min-height:118px}.metric-label{font-size:10px}.metric-value{font-size:25px;margin-top:10px}.metric-foot{font-size:10px}
   .priority-grid{grid-template-columns:1fr}.priority:nth-child(3){display:none}.priority{min-height:168px}
-  .forecast-card,.pulse-card{padding:16px}.forecast-grid{grid-template-columns:1fr 1fr;gap:10px}.forecast-value{font-size:23px}
+  .section-head{margin:24px 2px 10px}.section-head h2{font-size:17px}.section-head p{font-size:10px}
+  .forecast-card,.pulse-card{padding:13px}.forecast-context{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:1px 0 10px}.forecast-spotlight{grid-template-columns:1fr;gap:9px;padding:17px;border-radius:19px}.forecast-primary .forecast-value{font-size:39px}.forecast-result{padding:14px;border-radius:16px}.forecast-result .forecast-value{font-size:32px}.forecast-grid{grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}.forecast-kpi{min-height:105px;padding:13px;border-radius:16px}.forecast-value{font-size:23px}
   .pulse-row,.forecast-row{grid-template-columns:1fr 72px;gap:7px 10px}.track,.forecast-track{grid-column:1/-1;grid-row:2}.pulse-value,.forecast-meta{grid-column:2;grid-row:1}.pulse-name,.forecast-name{grid-column:1}
   .diagnostic{grid-template-columns:1fr 1fr}.mobile-nav{display:flex}
   .section-head{align-items:start}.section-head p{max-width:130px;text-align:right}
-  .drawer{padding:17px}.drawer-kpis{grid-template-columns:1fr 1fr}
+  .overlay{align-items:flex-end;justify-content:center;background:rgba(1,6,12,.78)}
+  .drawer{position:relative;width:100%;height:auto;max-height:92dvh;border:1px solid rgba(143,190,255,.18);border-bottom:0;border-radius:28px 28px 0 0;padding:29px 16px calc(18px + var(--safe-bottom));box-shadow:0 -26px 80px rgba(0,0,0,.58);animation:sheetUp .28s cubic-bezier(.2,.8,.2,1)}
+  .drawer:before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:42px;height:5px;border-radius:99px;background:rgba(255,255,255,.22)}
+  .drawer-head{position:sticky;top:-29px;z-index:4;margin:-1px -1px 0;padding:1px 1px 10px;background:linear-gradient(#081321 78%,transparent)}
+  .drawer-kpis{grid-template-columns:1fr 1fr}.close{width:44px;height:44px}
+  .target-channel{padding:14px}.target-channel-metrics{grid-template-columns:1fr 1fr;gap:10px}.target-channel-metrics strong{font-size:13px}
+  @keyframes sheetUp{from{transform:translateY(42px);opacity:0}}
+  .priority:active,.pulse-row:active,.forecast-row:active,.store-option:active{transform:scale(.985)}
 }
 @media(max-width:380px){
-  .side-stack{grid-template-columns:1fr}.actions{grid-template-columns:1fr}
+  .side-stack{grid-template-columns:1fr}.control-wrap{flex-basis:160px}.control-wrap:has(.store-select){flex-basis:210px}
   .priority-bottom{font-size:11px}
 }
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card,.ghost,.hero-forecast,.mobile-nav a,.mobile-nav button,.section-nav a,.target-channel-progress span{transition:none}.drawer{animation:none}body.motion-ready main>section{opacity:1;transform:none}}
 
 body:not(.app-ready) .shell, body:not(.app-ready) .mobile-nav{display:none}
 .login-layer{
@@ -304,8 +393,8 @@ body.app-ready .login-layer{display:none}
         <select id="supervisorFilter" class="select" aria-label="Filtrar supervisor"></select>
       </div>
       <div class="control-wrap">
-        <label for="groupFilter">Grupo</label>
-        <select id="groupFilter" class="select" aria-label="Filtrar grupo"></select>
+        <label for="groupFilter">Grupo de tienda</label>
+        <select id="groupFilter" class="select" aria-label="Filtrar grupo de tienda"></select>
       </div>
       <div class="control-wrap">
         <label for="storeFilter">Tienda</label>
@@ -317,32 +406,51 @@ body.app-ready .login-layer{display:none}
     </div>
   </header>
 
+  <nav class="section-nav" aria-label="Secciones del dashboard">
+    <a href="#resumen" data-nav="resumen" class="active"><span>⌂</span>Resumen</a>
+    <a href="#proyeccion" data-nav="proyeccion"><span>↗</span>Cierre estimado</a>
+    <a href="#prioridades" data-nav="prioridades"><span>!</span>Prioridades</a>
+    <a href="#grupos" data-nav="grupos"><span>≡</span>Grupos</a>
+  </nav>
+
   <main>
     <section id="resumen" class="grid-hero">
       <article class="card hero">
         <div class="hero-copy">
-          <div class="kicker">Venta acumulada</div>
+          <div class="kicker">Venta al corte</div>
           <div class="money" id="heroSales">$0</div>
-          <div class="goal-line">de <b id="heroGoal">$0</b> de meta mensual</div>
-          <div class="insight" id="mainInsight">Calculando lectura…</div>
+          <div class="goal-line">Meta mensual: <b id="heroGoal">$0</b></div>
+          <div class="insight" id="mainInsight" aria-live="polite">Calculando lectura ejecutiva…</div>
+          <button class="hero-forecast" id="heroForecastBtn" type="button" aria-label="Ir a la proyección detallada de cierre">
+            <div>
+              <span class="hero-forecast-label">Cierre estimado al 31 de julio</span>
+              <strong class="hero-forecast-value" id="heroForecastProjection">$0</strong>
+              <span class="hero-forecast-scope" id="heroForecastScope">Vista general</span>
+            </div>
+            <div class="hero-forecast-result">
+              <strong id="heroForecastPct">0%</strong>
+              <span>vs meta mensual</span>
+            </div>
+            <span class="hero-forecast-link">Ver escenario de cierre ↓</span>
+          </button>
         </div>
         <div class="ring" id="ring">
           <div class="expected-tick"></div>
           <div class="ring-content">
             <div class="ring-number" id="ringNumber">0%</div>
-            <div class="ring-label">Avance</div>
+            <div class="ring-label">Meta cubierta</div>
           </div>
         </div>
       </article>
 
       <div class="side-stack">
         <article class="card metric" title="Diferencia entre la venta acumulada y la venta que debería llevarse al día del corte.">
-          <div class="metric-label">Brecha contra ritmo</div>
+          <div class="metric-label">Diferencia al corte</div>
           <div class="metric-value" id="breachValue">$0</div>
           <div class="metric-foot" id="breachFoot">vs avance esperado</div>
         </article>
         <article class="card metric" title="Promedio diario requerido durante los días restantes para alcanzar la meta mensual.">
-          <div class="metric-label">Ritmo necesario</div>
+          <div class="metric-label">Venta diaria requerida</div>
           <div class="metric-value" id="neededValue">$0</div>
           <div class="metric-foot" id="neededFoot">por día restante</div>
         </article>
@@ -351,31 +459,33 @@ body.app-ready .login-layer{display:none}
 
     <section id="proyeccion">
       <div class="section-head">
-        <div><h2>Proyección contra meta</h2><p>Cómo cerraríamos el mes si se mantiene el ritmo actual.</p></div>
-        <p id="forecastSummary">Calculando escenario…</p>
+        <div><h2>Cierre estimado</h2><p>Resultado al 31 de julio con el promedio diario actual.</p></div>
+        <p id="forecastSummary" aria-live="polite">Calculando escenario…</p>
       </div>
       <article class="card forecast-card">
         <div class="forecast-context" id="forecastContext">Vista general</div>
+        <div class="forecast-spotlight">
+          <div class="forecast-primary">
+            <div class="forecast-label">Venta estimada al cierre</div>
+            <div class="forecast-value" id="forecastProjection">$0</div>
+            <div class="forecast-note">Estimación basada en el promedio diario acumulado al corte.</div>
+          </div>
+          <div class="forecast-result">
+            <div class="forecast-result-badge">Resultado vs meta</div>
+            <div class="forecast-value" id="forecastPct">0%</div>
+            <div class="forecast-note" id="forecastPctNote">Diferencia porcentual contra la meta mensual.</div>
+          </div>
+        </div>
         <div class="forecast-grid">
           <div class="forecast-kpi">
-            <div class="forecast-label">Proyección cierre</div>
-            <div class="forecast-value" id="forecastProjection">$0</div>
-            <div class="forecast-note">Venta estimada al día 31.</div>
-          </div>
-          <div class="forecast-kpi">
-            <div class="forecast-label">Cierre vs meta</div>
-            <div class="forecast-value" id="forecastPct">0%</div>
-            <div class="forecast-note" id="forecastPctNote">Cumplimiento proyectado.</div>
-          </div>
-          <div class="forecast-kpi">
-            <div class="forecast-label">Gap proyectado</div>
+            <div class="forecast-label">Diferencia estimada</div>
             <div class="forecast-value" id="forecastGap">$0</div>
-            <div class="forecast-note">Diferencia estimada contra meta mensual.</div>
+            <div class="forecast-note">Monto estimado por encima o por debajo de la meta.</div>
           </div>
           <div class="forecast-kpi">
             <div class="forecast-label">Margen ponderado</div>
             <div class="forecast-value" id="forecastMargin">0%</div>
-            <div class="forecast-note">Con el mix actual de venta.</div>
+            <div class="forecast-note">Calculado con la mezcla actual de ventas.</div>
           </div>
         </div>
         <div class="forecast-bars" id="forecastBars"></div>
@@ -384,7 +494,7 @@ body.app-ready .login-layer{display:none}
 
     <section id="prioridades">
       <div class="section-head">
-        <div><h2>Acción inmediata</h2><p>Las desviaciones con mayor impacto económico.</p></div>
+        <div><h2>Prioridades comerciales</h2><p>Tiendas con mayor diferencia económica contra el ritmo esperado.</p></div>
         <p id="prioritySummary"></p>
       </div>
       <div class="priority-grid" id="priorityGrid"></div>
@@ -392,13 +502,13 @@ body.app-ready .login-layer{display:none}
 
     <section id="grupos">
       <div class="section-head">
-        <div><h2>Pulso por grupo</h2><p>Avance real frente al ritmo esperado.</p></div>
-        <p>La línea blanca marca el avance esperado.</p>
+        <div><h2>Desempeño por grupo de tienda</h2><p>Venta al corte, meta mensual y diferencia contra el ritmo esperado.</p></div>
+        <p>La línea blanca indica el avance esperado a la fecha.</p>
       </div>
       <article class="card pulse-card">
         <div class="pulse-list" id="pulseList"></div>
         <div class="details-toggle">
-          <button class="ghost" id="diagToggle" type="button" style="margin:auto">Ver diagnóstico comercial</button>
+          <button class="ghost" id="diagToggle" type="button" style="margin:auto">Ver indicadores complementarios</button>
         </div>
         <div class="diagnostic" id="diagnostic">
           <div class="diag-item"><div class="diag-value" id="diagTickets">0</div><div class="diag-label">Tickets</div></div>
@@ -411,29 +521,41 @@ body.app-ready .login-layer{display:none}
 </div>
 
 <nav class="mobile-nav">
-  <a href="#resumen">Resumen</a>
-  <a href="#proyeccion">Proy.</a>
-  <a href="#prioridades">Prioridades</a>
-  <a href="#grupos">Grupos</a>
+  <a href="#resumen" data-nav="resumen" class="active" aria-label="Ir al resumen"><span class="nav-icon">⌂</span><span class="nav-label">Inicio</span></a>
+  <a href="#proyeccion" data-nav="proyeccion" aria-label="Ir a la proyección"><span class="nav-icon">↗</span><span class="nav-label">Cierre</span></a>
+  <a href="#prioridades" data-nav="prioridades" aria-label="Ir a prioridades"><span class="nav-icon">!</span><span class="nav-label">Alertas</span></a>
+  <a href="#grupos" data-nav="grupos" aria-label="Ir a grupos de tienda"><span class="nav-icon">≡</span><span class="nav-label">Grupos</span></a>
+  <button id="mobileExploreBtn" data-nav="tiendas" type="button" aria-label="Explorar tiendas"><span class="nav-icon">⌕</span><span class="nav-label">Tiendas</span></button>
 </nav>
 
 <div class="overlay" id="overlay">
-  <aside class="drawer" id="drawer"></aside>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Detalle comercial"></aside>
 </div>
 
 <script>
-const STORES = [{"store":"ALPURA","group":"ALPURA","goal":2400000,"sales":1149921.96,"tickets":635,"avgTicket":1810.9,"margin":3.27,"channels":[{"name":"ALPURA","sales":1149921.96,"tickets":635,"margin":3.27}]},{"store":"VIGS PLAZA MERCADO","group":"AUTOSERVICIO","goal":3438000,"sales":1868767.26,"tickets":13534,"avgTicket":138.08,"margin":27.12,"channels":[{"name":"MENUDEO","sales":1868767.26,"tickets":13534,"margin":27.12}]},{"store":"VIGS CACAHUATEPEC","group":"ABASTO","goal":2400000,"sales":1271183.13,"tickets":15663,"avgTicket":81.16,"margin":23.81,"channels":[{"name":"MENUDEO","sales":1271183.13,"tickets":15663,"margin":23.81}]},{"store":"VIGS HACIENDA","group":"ABASTO","goal":1700000,"sales":804005.73,"tickets":10864,"avgTicket":74.01,"margin":23.52,"channels":[{"name":"MENUDEO","sales":804005.73,"tickets":10864,"margin":23.52}]},{"store":"COMERCIAL MENUDEO","group":"ABASTO","goal":560000,"sales":302658.22,"tickets":3509,"avgTicket":86.25,"margin":20.34,"channels":[{"name":"MENUDEO","sales":302658.22,"tickets":3509,"margin":20.34}]},{"store":"VIGS CENTRAL","group":"ABASTO","goal":3400000,"sales":1698418.91,"tickets":18714,"avgTicket":90.76,"margin":23.69,"channels":[{"name":"MENUDEO","sales":1698418.91,"tickets":18714,"margin":23.69}]},{"store":"VIGS CBTA","group":"ABASTO","goal":1180000,"sales":577431.02,"tickets":9932,"avgTicket":58.14,"margin":25.09,"channels":[{"name":"MENUDEO","sales":577431.02,"tickets":9932,"margin":25.09}]},{"store":"VIGS PUERTO CENTRAL","group":"ABASTO","goal":1280000,"sales":647727.4,"tickets":8591,"avgTicket":75.4,"margin":23.35,"channels":[{"name":"MENUDEO","sales":647727.4,"tickets":8591,"margin":23.35}]},{"store":"VIGS RIO GRANDE","group":"ABASTO","goal":1700000,"sales":780965.18,"tickets":9867,"avgTicket":79.15,"margin":23.81,"channels":[{"name":"MENUDEO","sales":780965.18,"tickets":9867,"margin":23.81}]},{"store":"VIGS SAN JOSE DEL PROGRESO","group":"ABASTO","goal":900000,"sales":485978.33,"tickets":5453,"avgTicket":89.12,"margin":23.71,"channels":[{"name":"MENUDEO","sales":485978.33,"tickets":5453,"margin":23.71}]},{"store":"VIGS 5 DE MAYO","group":"ABASTO","goal":1350000,"sales":661813.76,"tickets":8278,"avgTicket":79.95,"margin":23.35,"channels":[{"name":"MENUDEO","sales":661813.76,"tickets":8278,"margin":23.35}]},{"store":"VIGS BASICO OMETEPEC","group":"AUTOSERVICIO BASICO","goal":8250000,"sales":4057609.57,"tickets":13458,"avgTicket":301.5,"margin":16.01,"channels":[{"name":"MAYOREO","sales":2491703.77,"tickets":2360,"margin":11.03},{"name":"MENUDEO","sales":1470485.06,"tickets":11030,"margin":24.75},{"name":"TELEMARKETING","sales":95420.74,"tickets":68,"margin":11.21}]},{"store":"VIGS BASICO JAMILTEPEC","group":"AUTOSERVICIO BASICO","goal":8350000,"sales":4250799.61,"tickets":17743,"avgTicket":239.58,"margin":19.11,"channels":[{"name":"MENUDEO","sales":2322416.23,"tickets":15841,"margin":25.86},{"name":"MAYOREO","sales":1872801.16,"tickets":1870,"margin":11},{"name":"TELEMARKETING","sales":55582.22,"tickets":32,"margin":10.54}]},{"store":"VIGS BASICO CUAJI","group":"AUTOSERVICIO BASICO","goal":5200000,"sales":1938909.29,"tickets":6710,"avgTicket":288.96,"margin":17.51,"channels":[{"name":"MAYOREO","sales":1099947.49,"tickets":1087,"margin":12.51},{"name":"MENUDEO","sales":817438.82,"tickets":5611,"margin":24.39},{"name":"TELEMARKETING","sales":21522.98,"tickets":12,"margin":11.92}]},{"store":"VIGS BASICO PUERTO ESCONDIDO","group":"AUTOSERVICIO BASICO","goal":5200000,"sales":2323376.25,"tickets":10449,"avgTicket":222.35,"margin":19.93,"channels":[{"name":"MENUDEO","sales":1204478.32,"tickets":9020,"margin":27.88},{"name":"MAYOREO","sales":753642.65,"tickets":1210,"margin":11.29},{"name":"TELEMARKETING","sales":288192.42,"tickets":177,"margin":11.77},{"name":"AGENTES LOCALES","sales":77062.86,"tickets":42,"margin":10.81}]},{"store":"VIGS MENUDEO","group":"CONVENIENCIA","goal":1685000,"sales":820907.57,"tickets":11304,"avgTicket":72.62,"margin":24.16,"channels":[{"name":"MENUDEO","sales":820907.57,"tickets":11304,"margin":24.16}]},{"store":"VIGS SAN ANTONIO","group":"CONVENIENCIA","goal":1426000,"sales":676147.04,"tickets":10426,"avgTicket":64.85,"margin":24.38,"channels":[{"name":"MENUDEO","sales":676147.04,"tickets":10426,"margin":24.38}]},{"store":"VIGS ALBOMONCI","group":"CONVENIENCIA","goal":1620000,"sales":809395.77,"tickets":11128,"avgTicket":72.74,"margin":23.99,"channels":[{"name":"MENUDEO","sales":809395.77,"tickets":11128,"margin":23.99}]},{"store":"VIGS PUERTO I","group":"CONVENIENCIA","goal":1209000,"sales":563517.24,"tickets":8046,"avgTicket":70.04,"margin":27.64,"channels":[{"name":"MENUDEO","sales":563517.24,"tickets":8046,"margin":27.64}]},{"store":"VIGS JAMILTEPEC","group":"CONVENIENCIA","goal":1147000,"sales":519362.12,"tickets":5652,"avgTicket":91.89,"margin":26.31,"channels":[{"name":"MENUDEO","sales":519362.12,"tickets":5652,"margin":26.31}]},{"store":"VIGS CUAJI","group":"CONVENIENCIA","goal":880000,"sales":346258.68,"tickets":5396,"avgTicket":64.17,"margin":24.44,"channels":[{"name":"MENUDEO","sales":346258.68,"tickets":5396,"margin":24.44}]},{"store":"VIGS MARQUELIA","group":"CONVENIENCIA","goal":682000,"sales":296534.59,"tickets":4581,"avgTicket":64.73,"margin":22.47,"channels":[{"name":"MENUDEO","sales":296534.59,"tickets":4581,"margin":22.47}]},{"store":"VIGS PUERTO II","group":"CONVENIENCIA","goal":1860000,"sales":899760.67,"tickets":11984,"avgTicket":75.08,"margin":27.32,"channels":[{"name":"MENUDEO","sales":899760.67,"tickets":11984,"margin":27.32}]},{"store":"VIGS TONAMECA","group":"CONVENIENCIA","goal":750000,"sales":333750.94,"tickets":4286,"avgTicket":77.87,"margin":29.02,"channels":[{"name":"MENUDEO","sales":333750.94,"tickets":4286,"margin":29.02}]},{"store":"VIGS GAVIOTAS","group":"CONVENIENCIA","goal":1180000,"sales":589890.37,"tickets":9893,"avgTicket":59.63,"margin":23.26,"channels":[{"name":"MENUDEO","sales":589890.37,"tickets":9893,"margin":23.26}]},{"store":"VIGS ALVARO CARRILLO","group":"CONVENIENCIA","goal":930000,"sales":407485.16,"tickets":7153,"avgTicket":56.97,"margin":25.51,"channels":[{"name":"MENUDEO","sales":407485.16,"tickets":7153,"margin":25.51}]},{"store":"VIGS LIBRAMIENTO","group":"CONVENIENCIA","goal":1570000,"sales":787655.1,"tickets":10886,"avgTicket":72.35,"margin":24.55,"channels":[{"name":"MENUDEO","sales":787655.1,"tickets":10886,"margin":24.55}]},{"store":"VIGS AVENIDA JUAREZ","group":"CONVENIENCIA","goal":850000,"sales":426392.79,"tickets":7760,"avgTicket":54.95,"margin":24.37,"channels":[{"name":"MENUDEO","sales":426392.79,"tickets":7760,"margin":24.37}]},{"store":"VIGS ZICATELA","group":"CONVENIENCIA","goal":1800000,"sales":823011.8,"tickets":10684,"avgTicket":77.03,"margin":28.86,"channels":[{"name":"MENUDEO","sales":823011.8,"tickets":10684,"margin":28.86}]},{"store":"VIGS BOULEVARD","group":"CONVENIENCIA","goal":1209000,"sales":609987.26,"tickets":7955,"avgTicket":76.68,"margin":28.17,"channels":[{"name":"MENUDEO","sales":609987.26,"tickets":7955,"margin":28.17}]},{"store":"VIGS PUERTO MERCADO","group":"CONVENIENCIA","goal":700000,"sales":311191.38,"tickets":5892,"avgTicket":52.82,"margin":28.08,"channels":[{"name":"MENUDEO","sales":311191.38,"tickets":5892,"margin":28.08}]},{"store":"VIGS CENTRO PINOTEPA","group":"CONVENIENCIA","goal":1800000,"sales":865471.85,"tickets":13357,"avgTicket":64.8,"margin":23.94,"channels":[{"name":"MENUDEO","sales":865471.85,"tickets":13357,"margin":23.94}]},{"store":"VIGS GRANJAS DEL PESCADOR","group":"CONVENIENCIA","goal":1450000,"sales":728960.91,"tickets":8721,"avgTicket":83.59,"margin":27.87,"channels":[{"name":"MENUDEO","sales":728960.91,"tickets":8721,"margin":27.87}]},{"store":"VIGS PUERTO ADOQUIN","group":"CONVENIENCIA","goal":1180000,"sales":471548.34,"tickets":7447,"avgTicket":63.32,"margin":28.93,"channels":[{"name":"MENUDEO","sales":471548.34,"tickets":7447,"margin":28.93}]},{"store":"DULCE MAGICO I","group":"DULCERIAS","goal":352000,"sales":175284.82,"tickets":680,"avgTicket":257.77,"margin":19.38,"channels":[{"name":"DULCERIA","sales":175284.82,"tickets":680,"margin":19.38}]},{"store":"DULCE MAGICO II","group":"DULCERIAS","goal":890000,"sales":448288.42,"tickets":1547,"avgTicket":289.78,"margin":22.75,"channels":[{"name":"DULCERIA","sales":448288.42,"tickets":1547,"margin":22.75}]},{"store":"DULCE MAGICO III","group":"DULCERIAS","goal":1116000,"sales":573250.7,"tickets":1092,"avgTicket":524.95,"margin":22.34,"channels":[{"name":"DULCERIA","sales":573250.7,"tickets":1092,"margin":22.34}]},{"store":"DULCE MAGICO JAMILTEPEC","group":"DULCERIAS","goal":420000,"sales":239298.5,"tickets":787,"avgTicket":304.06,"margin":23.32,"channels":[{"name":"DULCERIA","sales":239298.5,"tickets":787,"margin":23.32}]},{"store":"MATERIALES SAN ANTONIO","group":"MATERIALES CONSTRUCCION","goal":558000,"sales":240934,"tickets":59,"avgTicket":4083.63,"margin":19.9,"channels":[{"name":"MATERIALES","sales":240934,"tickets":59,"margin":19.9}]},{"store":"PORCELANITE","group":"MATERIALES CONSTRUCCION","goal":255000,"sales":91436,"tickets":46,"avgTicket":1987.74,"margin":23.66,"channels":[{"name":"MATERIALES","sales":91436,"tickets":46,"margin":23.66}]},{"store":"BODEGA LA GUADALUPANA","group":"MAYOREO","goal":30000000,"sales":13356075.52,"tickets":2648,"avgTicket":5043.84,"margin":8.72,"channels":[{"name":"AGENTES","sales":12050596.44,"tickets":2163,"margin":8.57},{"name":"SURTETODO","sales":1264183.85,"tickets":455,"margin":10.14},{"name":"CAPTURA FORANEO","sales":41295.23,"tickets":30,"margin":10.45}]},{"store":"DIVITSA I","group":"MAYOREO","goal":11400000,"sales":6136537.63,"tickets":2683,"avgTicket":2287.19,"margin":13.25,"channels":[{"name":"MOSTRADOR","sales":3057804.24,"tickets":1945,"margin":10.89},{"name":"AGENTES LOCALES","sales":1797062.38,"tickets":511,"margin":9.98},{"name":"TELEMARKETING","sales":1281671.01,"tickets":227,"margin":23.48}]},{"store":"COMERCIAL MAYOREO","group":"MAYOREO","goal":1085000,"sales":640114.55,"tickets":784,"avgTicket":816.47,"margin":11.16,"channels":[{"name":"MOSTRADOR","sales":640114.55,"tickets":784,"margin":11.16}]},{"store":"DIVITSA II","group":"MAYOREO","goal":10800000,"sales":4749965.91,"tickets":2557,"avgTicket":1857.63,"margin":11.21,"channels":[{"name":"MOSTRADOR","sales":4749965.91,"tickets":2557,"margin":11.21}]},{"store":"DIVITSA IV","group":"MAYOREO","goal":950000,"sales":476843,"tickets":929,"avgTicket":513.29,"margin":11.18,"channels":[{"name":"MOSTRADOR","sales":476843,"tickets":929,"margin":11.18}]},{"store":"DIVITSA III","group":"MAYOREO","goal":2650000,"sales":1596553.62,"tickets":2186,"avgTicket":730.35,"margin":11.35,"channels":[{"name":"MOSTRADOR","sales":1596553.62,"tickets":2186,"margin":11.35}]},{"store":"VIGS REGALOS","group":"REGALOS","goal":320000,"sales":156291,"tickets":580,"avgTicket":269.47,"margin":46.41,"channels":[{"name":"MENUDEO","sales":156291,"tickets":580,"margin":46.41}]},{"store":"VIGS MOVIL 001","group":"VIGS MOVIL","goal":125000,"sales":51273,"tickets":1001,"avgTicket":51.22,"margin":34.46,"channels":[{"name":"MENUDEO","sales":51273,"tickets":1001,"margin":34.46}]},{"store":"VIGS MOVIL 002","group":"VIGS MOVIL","goal":108000,"sales":51178.5,"tickets":1098,"avgTicket":46.61,"margin":32.63,"channels":[{"name":"MENUDEO","sales":51178.5,"tickets":1098,"margin":32.63}]}];
+const STORES = [{"store":"ALPURA","group":"ALPURA","goal":2400000,"sales":1149921.96,"tickets":635,"avgTicket":1810.9,"margin":3.27,"channels":[{"name":"ALPURA","sales":1149921.96,"tickets":635,"margin":3.27}],"targets":{}},{"store":"VIGS PLAZA MERCADO","group":"AUTOSERVICIO","goal":3438000,"sales":1868767.26,"tickets":13534,"avgTicket":138.08,"margin":27.12,"channels":[{"name":"MENUDEO","sales":1868767.26,"tickets":13534,"margin":27.12}],"targets":{}},{"store":"VIGS CACAHUATEPEC","group":"ABASTO","goal":2400000,"sales":1271183.13,"tickets":15663,"avgTicket":81.16,"margin":23.81,"channels":[{"name":"MENUDEO","sales":1271183.13,"tickets":15663,"margin":23.81}],"targets":{}},{"store":"VIGS HACIENDA","group":"ABASTO","goal":1700000,"sales":804005.73,"tickets":10864,"avgTicket":74.01,"margin":23.52,"channels":[{"name":"MENUDEO","sales":804005.73,"tickets":10864,"margin":23.52}],"targets":{}},{"store":"COMERCIAL MENUDEO","group":"ABASTO","goal":560000,"sales":302658.22,"tickets":3509,"avgTicket":86.25,"margin":20.34,"channels":[{"name":"MENUDEO","sales":302658.22,"tickets":3509,"margin":20.34}],"targets":{}},{"store":"VIGS CENTRAL","group":"ABASTO","goal":3400000,"sales":1698418.91,"tickets":18714,"avgTicket":90.76,"margin":23.69,"channels":[{"name":"MENUDEO","sales":1698418.91,"tickets":18714,"margin":23.69}],"targets":{}},{"store":"VIGS CBTA","group":"ABASTO","goal":1180000,"sales":577431.02,"tickets":9932,"avgTicket":58.14,"margin":25.09,"channels":[{"name":"MENUDEO","sales":577431.02,"tickets":9932,"margin":25.09}],"targets":{}},{"store":"VIGS PUERTO CENTRAL","group":"ABASTO","goal":1280000,"sales":647727.4,"tickets":8591,"avgTicket":75.4,"margin":23.35,"channels":[{"name":"MENUDEO","sales":647727.4,"tickets":8591,"margin":23.35}],"targets":{}},{"store":"VIGS RIO GRANDE","group":"ABASTO","goal":1700000,"sales":780965.18,"tickets":9867,"avgTicket":79.15,"margin":23.81,"channels":[{"name":"MENUDEO","sales":780965.18,"tickets":9867,"margin":23.81}],"targets":{}},{"store":"VIGS SAN JOSE DEL PROGRESO","group":"ABASTO","goal":900000,"sales":485978.33,"tickets":5453,"avgTicket":89.12,"margin":23.71,"channels":[{"name":"MENUDEO","sales":485978.33,"tickets":5453,"margin":23.71}],"targets":{}},{"store":"VIGS 5 DE MAYO","group":"ABASTO","goal":1350000,"sales":661813.76,"tickets":8278,"avgTicket":79.95,"margin":23.35,"channels":[{"name":"MENUDEO","sales":661813.76,"tickets":8278,"margin":23.35}],"targets":{}},{"store":"VIGS BASICO OMETEPEC","group":"AUTOSERVICIO BASICO","goal":8250000,"sales":4057609.57,"tickets":13458,"avgTicket":301.5,"margin":16.01,"channels":[{"name":"MAYOREO","sales":2491703.77,"tickets":2360,"margin":11.03},{"name":"MENUDEO","sales":1470485.06,"tickets":11030,"margin":24.75},{"name":"TELEMARKETING","sales":95420.74,"tickets":68,"margin":11.21}],"targets":[{"name":"MAYOREO","share":0.6,"goal":4950000},{"name":"MENUDEO","share":0.4,"goal":3300000}]},{"store":"VIGS BASICO JAMILTEPEC","group":"AUTOSERVICIO BASICO","goal":8350000,"sales":4250799.61,"tickets":17743,"avgTicket":239.58,"margin":19.11,"channels":[{"name":"MENUDEO","sales":2322416.23,"tickets":15841,"margin":25.86},{"name":"MAYOREO","sales":1872801.16,"tickets":1870,"margin":11},{"name":"TELEMARKETING","sales":55582.22,"tickets":32,"margin":10.54}],"targets":[{"name":"MAYOREO","share":0.5,"goal":4175000},{"name":"MENUDEO","share":0.5,"goal":4175000}]},{"store":"VIGS BASICO CUAJI","group":"AUTOSERVICIO BASICO","goal":5200000,"sales":1938909.29,"tickets":6710,"avgTicket":288.96,"margin":17.51,"channels":[{"name":"MAYOREO","sales":1099947.49,"tickets":1087,"margin":12.51},{"name":"MENUDEO","sales":817438.82,"tickets":5611,"margin":24.39},{"name":"TELEMARKETING","sales":21522.98,"tickets":12,"margin":11.92}],"targets":[{"name":"MAYOREO","share":0.6,"goal":3120000},{"name":"MENUDEO","share":0.4,"goal":2080000}]},{"store":"VIGS BASICO PUERTO ESCONDIDO","group":"AUTOSERVICIO BASICO","goal":5200000,"sales":2323376.25,"tickets":10449,"avgTicket":222.35,"margin":19.93,"channels":[{"name":"MENUDEO","sales":1204478.32,"tickets":9020,"margin":27.88},{"name":"MAYOREO","sales":753642.65,"tickets":1210,"margin":11.29},{"name":"TELEMARKETING","sales":288192.42,"tickets":177,"margin":11.77},{"name":"AGENTES LOCALES","sales":77062.86,"tickets":42,"margin":10.81}],"targets":[{"name":"MAYOREO","share":0.45,"goal":2340000},{"name":"MENUDEO","share":0.5,"goal":2600000},{"name":"AGENTE LOCAL","share":0.05,"goal":260000}]},{"store":"VIGS MENUDEO","group":"CONVENIENCIA","goal":1685000,"sales":820907.57,"tickets":11304,"avgTicket":72.62,"margin":24.16,"channels":[{"name":"MENUDEO","sales":820907.57,"tickets":11304,"margin":24.16}],"targets":{}},{"store":"VIGS SAN ANTONIO","group":"CONVENIENCIA","goal":1426000,"sales":676147.04,"tickets":10426,"avgTicket":64.85,"margin":24.38,"channels":[{"name":"MENUDEO","sales":676147.04,"tickets":10426,"margin":24.38}],"targets":{}},{"store":"VIGS ALBOMONCI","group":"CONVENIENCIA","goal":1620000,"sales":809395.77,"tickets":11128,"avgTicket":72.74,"margin":23.99,"channels":[{"name":"MENUDEO","sales":809395.77,"tickets":11128,"margin":23.99}],"targets":{}},{"store":"VIGS PUERTO I","group":"CONVENIENCIA","goal":1209000,"sales":563517.24,"tickets":8046,"avgTicket":70.04,"margin":27.64,"channels":[{"name":"MENUDEO","sales":563517.24,"tickets":8046,"margin":27.64}],"targets":{}},{"store":"VIGS JAMILTEPEC","group":"CONVENIENCIA","goal":1147000,"sales":519362.12,"tickets":5652,"avgTicket":91.89,"margin":26.31,"channels":[{"name":"MENUDEO","sales":519362.12,"tickets":5652,"margin":26.31}],"targets":{}},{"store":"VIGS CUAJI","group":"CONVENIENCIA","goal":880000,"sales":346258.68,"tickets":5396,"avgTicket":64.17,"margin":24.44,"channels":[{"name":"MENUDEO","sales":346258.68,"tickets":5396,"margin":24.44}],"targets":{}},{"store":"VIGS MARQUELIA","group":"CONVENIENCIA","goal":682000,"sales":296534.59,"tickets":4581,"avgTicket":64.73,"margin":22.47,"channels":[{"name":"MENUDEO","sales":296534.59,"tickets":4581,"margin":22.47}],"targets":{}},{"store":"VIGS PUERTO II","group":"CONVENIENCIA","goal":1860000,"sales":899760.67,"tickets":11984,"avgTicket":75.08,"margin":27.32,"channels":[{"name":"MENUDEO","sales":899760.67,"tickets":11984,"margin":27.32}],"targets":{}},{"store":"VIGS TONAMECA","group":"CONVENIENCIA","goal":750000,"sales":333750.94,"tickets":4286,"avgTicket":77.87,"margin":29.02,"channels":[{"name":"MENUDEO","sales":333750.94,"tickets":4286,"margin":29.02}],"targets":{}},{"store":"VIGS GAVIOTAS","group":"CONVENIENCIA","goal":1180000,"sales":589890.37,"tickets":9893,"avgTicket":59.63,"margin":23.26,"channels":[{"name":"MENUDEO","sales":589890.37,"tickets":9893,"margin":23.26}],"targets":{}},{"store":"VIGS ALVARO CARRILLO","group":"CONVENIENCIA","goal":930000,"sales":407485.16,"tickets":7153,"avgTicket":56.97,"margin":25.51,"channels":[{"name":"MENUDEO","sales":407485.16,"tickets":7153,"margin":25.51}],"targets":{}},{"store":"VIGS LIBRAMIENTO","group":"CONVENIENCIA","goal":1570000,"sales":787655.1,"tickets":10886,"avgTicket":72.35,"margin":24.55,"channels":[{"name":"MENUDEO","sales":787655.1,"tickets":10886,"margin":24.55}],"targets":{}},{"store":"VIGS AVENIDA JUAREZ","group":"CONVENIENCIA","goal":850000,"sales":426392.79,"tickets":7760,"avgTicket":54.95,"margin":24.37,"channels":[{"name":"MENUDEO","sales":426392.79,"tickets":7760,"margin":24.37}],"targets":{}},{"store":"VIGS ZICATELA","group":"CONVENIENCIA","goal":1800000,"sales":823011.8,"tickets":10684,"avgTicket":77.03,"margin":28.86,"channels":[{"name":"MENUDEO","sales":823011.8,"tickets":10684,"margin":28.86}],"targets":{}},{"store":"VIGS BOULEVARD","group":"CONVENIENCIA","goal":1209000,"sales":609987.26,"tickets":7955,"avgTicket":76.68,"margin":28.17,"channels":[{"name":"MENUDEO","sales":609987.26,"tickets":7955,"margin":28.17}],"targets":{}},{"store":"VIGS PUERTO MERCADO","group":"CONVENIENCIA","goal":700000,"sales":311191.38,"tickets":5892,"avgTicket":52.82,"margin":28.08,"channels":[{"name":"MENUDEO","sales":311191.38,"tickets":5892,"margin":28.08}],"targets":{}},{"store":"VIGS CENTRO PINOTEPA","group":"CONVENIENCIA","goal":1800000,"sales":865471.85,"tickets":13357,"avgTicket":64.8,"margin":23.94,"channels":[{"name":"MENUDEO","sales":865471.85,"tickets":13357,"margin":23.94}],"targets":{}},{"store":"VIGS GRANJAS DEL PESCADOR","group":"CONVENIENCIA","goal":1450000,"sales":728960.91,"tickets":8721,"avgTicket":83.59,"margin":27.87,"channels":[{"name":"MENUDEO","sales":728960.91,"tickets":8721,"margin":27.87}],"targets":{}},{"store":"VIGS PUERTO ADOQUIN","group":"CONVENIENCIA","goal":1180000,"sales":471548.34,"tickets":7447,"avgTicket":63.32,"margin":28.93,"channels":[{"name":"MENUDEO","sales":471548.34,"tickets":7447,"margin":28.93}],"targets":{}},{"store":"DULCE MAGICO I","group":"DULCERIAS","goal":352000,"sales":175284.82,"tickets":680,"avgTicket":257.77,"margin":19.38,"channels":[{"name":"DULCERIA","sales":175284.82,"tickets":680,"margin":19.38}],"targets":{}},{"store":"DULCE MAGICO II","group":"DULCERIAS","goal":890000,"sales":448288.42,"tickets":1547,"avgTicket":289.78,"margin":22.75,"channels":[{"name":"DULCERIA","sales":448288.42,"tickets":1547,"margin":22.75}],"targets":{}},{"store":"DULCE MAGICO III","group":"DULCERIAS","goal":1116000,"sales":573250.7,"tickets":1092,"avgTicket":524.95,"margin":22.34,"channels":[{"name":"DULCERIA","sales":573250.7,"tickets":1092,"margin":22.34}],"targets":{}},{"store":"DULCE MAGICO JAMILTEPEC","group":"DULCERIAS","goal":420000,"sales":239298.5,"tickets":787,"avgTicket":304.06,"margin":23.32,"channels":[{"name":"DULCERIA","sales":239298.5,"tickets":787,"margin":23.32}],"targets":{}},{"store":"MATERIALES SAN ANTONIO","group":"MATERIALES CONSTRUCCION","goal":558000,"sales":240934,"tickets":59,"avgTicket":4083.63,"margin":19.9,"channels":[{"name":"MATERIALES","sales":240934,"tickets":59,"margin":19.9}],"targets":{}},{"store":"PORCELANITE","group":"MATERIALES CONSTRUCCION","goal":255000,"sales":91436,"tickets":46,"avgTicket":1987.74,"margin":23.66,"channels":[{"name":"MATERIALES","sales":91436,"tickets":46,"margin":23.66}],"targets":{}},{"store":"BODEGA LA GUADALUPANA","group":"MAYOREO","goal":30000000,"sales":13356075.52,"tickets":2648,"avgTicket":5043.84,"margin":8.72,"channels":[{"name":"AGENTES","sales":12050596.44,"tickets":2163,"margin":8.57},{"name":"SURTETODO","sales":1264183.85,"tickets":455,"margin":10.14},{"name":"CAPTURA FORANEO","sales":41295.23,"tickets":30,"margin":10.45}],"targets":{}},{"store":"DIVITSA I","group":"MAYOREO","goal":11400000,"sales":6136537.63,"tickets":2683,"avgTicket":2287.19,"margin":13.25,"channels":[{"name":"MOSTRADOR","sales":3057804.24,"tickets":1945,"margin":10.89},{"name":"AGENTES LOCALES","sales":1797062.38,"tickets":511,"margin":9.98},{"name":"TELEMARKETING","sales":1281671.01,"tickets":227,"margin":23.48}],"targets":{}},{"store":"COMERCIAL MAYOREO","group":"MAYOREO","goal":1085000,"sales":640114.55,"tickets":784,"avgTicket":816.47,"margin":11.16,"channels":[{"name":"MOSTRADOR","sales":640114.55,"tickets":784,"margin":11.16}],"targets":{}},{"store":"DIVITSA II","group":"MAYOREO","goal":10800000,"sales":4749965.91,"tickets":2557,"avgTicket":1857.63,"margin":11.21,"channels":[{"name":"MOSTRADOR","sales":4749965.91,"tickets":2557,"margin":11.21}],"targets":{}},{"store":"DIVITSA IV","group":"MAYOREO","goal":950000,"sales":476843,"tickets":929,"avgTicket":513.29,"margin":11.18,"channels":[{"name":"MOSTRADOR","sales":476843,"tickets":929,"margin":11.18}],"targets":{}},{"store":"DIVITSA III","group":"MAYOREO","goal":2650000,"sales":1596553.62,"tickets":2186,"avgTicket":730.35,"margin":11.35,"channels":[{"name":"MOSTRADOR","sales":1596553.62,"tickets":2186,"margin":11.35}],"targets":{}},{"store":"VIGS REGALOS","group":"REGALOS","goal":320000,"sales":156291,"tickets":580,"avgTicket":269.47,"margin":46.41,"channels":[{"name":"MENUDEO","sales":156291,"tickets":580,"margin":46.41}],"targets":{}},{"store":"VIGS MOVIL 001","group":"VIGS MOVIL","goal":125000,"sales":51273,"tickets":1001,"avgTicket":51.22,"margin":34.46,"channels":[{"name":"MENUDEO","sales":51273,"tickets":1001,"margin":34.46}],"targets":{}},{"store":"VIGS MOVIL 002","group":"VIGS MOVIL","goal":108000,"sales":51178.5,"tickets":1098,"avgTicket":46.61,"margin":32.63,"channels":[{"name":"MENUDEO","sales":51178.5,"tickets":1098,"margin":32.63}],"targets":{}}];
 const DAYS_ELAPSED = 16, DAYS_MONTH = 31, DAYS_LEFT = 15;
 const EXPECTED = DAYS_ELAPSED / DAYS_MONTH;
+const CHANNEL_TARGETS = {"VIGS BASICO OMETEPEC":[{"name":"MAYOREO","share":0.6,"goal":4950000},{"name":"MENUDEO","share":0.4,"goal":3300000}],"VIGS BASICO JAMILTEPEC":[{"name":"MAYOREO","share":0.5,"goal":4175000},{"name":"MENUDEO","share":0.5,"goal":4175000}],"VIGS BASICO CUAJI":[{"name":"MAYOREO","share":0.6,"goal":3120000},{"name":"MENUDEO","share":0.4,"goal":2080000}],"VIGS BASICO PUERTO ESCONDIDO":[{"name":"MAYOREO","share":0.45,"goal":2340000},{"name":"MENUDEO","share":0.5,"goal":2600000},{"name":"AGENTE LOCAL","share":0.05,"goal":260000}]};
 const $ = s => document.querySelector(s);
 const money = (n, compact=false) => {
+  if(!Number.isFinite(n)) return "—";
   const sign = n < 0 ? "-" : "";
   const a = Math.abs(n);
   if (compact && a >= 1000000) return sign+"$"+(a/1000000).toFixed(a>=10000000?1:2)+" M";
   if (compact && a >= 1000) return sign+"$"+(a/1000).toFixed(0)+" mil";
   return sign+a.toLocaleString("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0});
 };
-const pct = n => (n*100).toFixed(1)+"%";
+const cleanRate = n => Math.abs(n)<.0005 ? 0 : n;
+const pct = n => Number.isFinite(n) ? (cleanRate(n)*100).toFixed(1)+"%" : "—";
+const signedPct = n => {
+  if(!Number.isFinite(n)) return "—";
+  const value=cleanRate(n);
+  return (value>0?"+":"")+pct(value);
+};
+const pp = n => Number.isFinite(n) ? (Math.abs(cleanRate(n))*100).toFixed(1)+" pp" : "—";
+const ratio = (value, base) => base ? value/base : 0;
+const attainmentLabel = value => value>=1 ? `Meta superada ${signedPct(value-1)}` : `${pct(value)} de la meta mensual`;
 let groups = [];
 let CURRENT_USER = null;
 const ALL_STORES = JSON.parse(JSON.stringify(STORES));
@@ -443,7 +565,7 @@ const filter = $("#groupFilter");
 const storeFilter = $("#storeFilter");
 function refreshGroupFilter(){
   groups = [...new Set(STORES.map(s=>s.group).filter(Boolean))].sort();
-  filter.innerHTML = `<option value="TODOS">Todos los grupos</option>` + groups.map(g=>`<option>${g}</option>`).join("");
+  filter.innerHTML = `<option value="TODOS">Todos los grupos de tienda</option>` + groups.map(g=>`<option>${g}</option>`).join("");
   filter.value = "TODOS";
 }
 
@@ -530,6 +652,8 @@ function applyLogin(username){
     : `Corte acumulado al 16 de julio de 2026 · Supervisor ${user.name}`;
   document.querySelector(".statusline").innerHTML = `<span class="dot"></span>${scopeText}`;
   applyScope();
+  setupNavigation();
+  setupSectionMotion();
 }
 
 function initLogin(){
@@ -573,12 +697,15 @@ function sum(arr,key){return arr.reduce((a,b)=>a+b[key],0)}
 function calc(arr){
   const goal=sum(arr,"goal"), sales=sum(arr,"sales"), tickets=sum(arr,"tickets");
   const marginValue=arr.reduce((a,s)=>a+s.sales*s.margin/100,0);
+  const progress=ratio(sales,goal);
+  const currentDaily=DAYS_ELAPSED>0 ? sales/DAYS_ELAPSED : 0;
+  const projection=DAYS_ELAPSED>0 ? currentDaily*DAYS_MONTH : 0;
   return {
-    goal,sales,tickets,progress:sales/goal,expectedSales:goal*EXPECTED,
-    breach:sales-goal*EXPECTED, currentDaily:sales/DAYS_ELAPSED,
-    neededDaily:(goal-sales)/DAYS_LEFT, projection:sales/DAYS_ELAPSED*DAYS_MONTH,
-    avgTicket:tickets?sales/tickets:0, margin:sales?marginValue/sales*100:0,
-    projectionPct:goal ? (sales/DAYS_ELAPSED*DAYS_MONTH)/goal : 0
+    goal,sales,tickets,progress,expectedSales:goal*EXPECTED,
+    breach:sales-goal*EXPECTED,currentDaily,
+    neededDaily:DAYS_LEFT>0 ? Math.max(goal-sales,0)/DAYS_LEFT : 0,projection,
+    avgTicket:ratio(sales,tickets),margin:sales?marginValue/sales*100:0,
+    projectionPct:ratio(projection,goal)
   };
 }
 function statusClass(diff){
@@ -604,8 +731,15 @@ function scopeLabel(){
       ? "Vista dirección"
       : CURRENT_USER ? `Supervisor ${CURRENT_USER.name}` : "Vista general";
   if(storeFilter.value!=="TODAS") return `${supScope} · Tienda ${storeFilter.value}`;
-  if(filter.value!=="TODOS") return `${supScope} · Grupo ${filter.value}`;
-  return `${supScope} · todos los grupos`;
+  if(filter.value!=="TODOS") return `${supScope} · Grupo de tienda ${filter.value}`;
+  return `${supScope} · todos los grupos de tienda`;
+}
+function compactScopeLabel(){
+  const sf=$("#supervisorFilter");
+  if(storeFilter.value!=="TODAS") return storeFilter.value;
+  if(filter.value!=="TODOS") return `Grupo ${filter.value}`;
+  if(CURRENT_USER && CURRENT_USER.role==="director" && sf && sf.value!=="TODOS") return `Supervisor ${sf.value}`;
+  return CURRENT_USER && CURRENT_USER.role!=="director" ? `Supervisor ${CURRENT_USER.name}` : "Vista general";
 }
 function render(){
   const arr=subset(), c=calc(arr), diff=c.progress-EXPECTED;
@@ -619,23 +753,30 @@ function render(){
 
   const insight=$("#mainInsight");
   insight.className="insight"+(diff>=0?" good":"");
-  if(diff>=0){
-    insight.innerHTML=`● El resultado está <b>${pct(diff)}</b> arriba del ritmo requerido.`;
+  const remaining=Math.max(c.goal-c.sales,0);
+  if(c.sales>=c.goal){
+    insight.innerHTML=`● Meta mensual superada por <b>${money(c.sales-c.goal,true)}</b>.`;
+  }else if(diff>=0){
+    insight.innerHTML=`● Faltan <b>${money(remaining,true)}</b>. El avance está ${pp(diff)} arriba del ritmo esperado.`;
   }else{
-    insight.innerHTML=`● El resultado está <b>${pct(Math.abs(diff))}</b> debajo del ritmo requerido.`;
+    insight.innerHTML=`● Faltan <b>${money(remaining,true)}</b>. El avance está ${pp(diff)} debajo del ritmo esperado.`;
   }
 
   const breach=$("#breachValue");
   breach.textContent=money(c.breach,true);
   breach.className="metric-value "+statusClass(diff);
-  $("#breachFoot").textContent=`Esperado al corte: ${money(c.expectedSales,true)}`;
+  $("#breachFoot").textContent=`Venta esperada al corte: ${money(c.expectedSales,true)}`;
 
   $("#neededValue").textContent=money(c.neededDaily,true);
-  const increment=(c.neededDaily/c.currentDaily)-1;
+  const increment=c.currentDaily>0 ? (c.neededDaily/c.currentDaily)-1 : (c.neededDaily>0 ? Infinity : 0);
   $("#neededValue").className="metric-value "+(increment<=0?"pos":increment<=.08?"warn":"neg");
-  $("#neededFoot").textContent=increment>0
-    ? `${pct(increment)} arriba del promedio actual`
-    : `El promedio actual ya cubre la meta`;
+  $("#neededFoot").textContent=DAYS_LEFT<=0
+    ? (c.sales>=c.goal ? `Meta alcanzada al cierre` : `Periodo concluido`)
+    : !Number.isFinite(increment)
+      ? `Sin venta base; requiere activación inmediata`
+      : increment>0
+        ? `Requiere ${pct(increment)} más que el promedio actual`
+        : `El promedio actual es suficiente`;
 
   renderProjection(arr,c);
   renderPriorities(arr);
@@ -645,19 +786,36 @@ function render(){
   $("#diagMargin").textContent=c.margin.toFixed(2)+"%";
 }
 function storeMetrics(s){
-  const progress=s.sales/s.goal, breach=s.sales-s.goal*EXPECTED;
+  const progress=ratio(s.sales,s.goal), breach=s.sales-s.goal*EXPECTED;
+  const currentDaily=DAYS_ELAPSED>0 ? s.sales/DAYS_ELAPSED : 0;
+  const projection=DAYS_ELAPSED>0 ? currentDaily*DAYS_MONTH : 0;
   return {
     ...s, progress, breach,
-    neededDaily:(s.goal-s.sales)/DAYS_LEFT,
-    currentDaily:s.sales/DAYS_ELAPSED,
-    projection:s.sales/DAYS_ELAPSED*DAYS_MONTH,
-    projectionPct:s.goal ? (s.sales/DAYS_ELAPSED*DAYS_MONTH)/s.goal : 0,
-    projectionGap:s.sales/DAYS_ELAPSED*DAYS_MONTH-s.goal
+    neededDaily:DAYS_LEFT>0 ? Math.max(s.goal-s.sales,0)/DAYS_LEFT : 0,
+    currentDaily,projection,
+    projectionPct:ratio(projection,s.goal),
+    projectionGap:projection-s.goal
   };
 }
 function projectionRows(arr){
   if(storeFilter.value!=="TODAS" && arr.length){
     const s=storeMetrics(arr[0]);
+    if(canViewAssignedChannelGoals(s)){
+      const channels=new Map(s.channels.map(channel=>[normalizeChannelName(channel.name),channel]));
+      return CHANNEL_TARGETS[s.store]
+        .map(target=>{
+          const actual=channels.get(normalizeChannelName(target.name)) || {sales:0};
+          const projected=DAYS_ELAPSED>0 ? actual.sales/DAYS_ELAPSED*DAYS_MONTH : 0;
+          return {
+            name:target.name,
+            pct:ratio(projected,target.goal),
+            amount:projected-target.goal,
+            note:`Meta asignada ${money(target.goal,true)}`,
+            isAssignedChannel:true
+          };
+        })
+        .sort((a,b)=>a.pct-b.pct);
+    }
     return s.channels
       .map(ch=>{
         const projected=ch.sales/DAYS_ELAPSED*DAYS_MONTH;
@@ -685,31 +843,36 @@ function renderProjection(arr,c){
   const diff=vsMeta-1;
   $("#forecastContext").textContent=scopeLabel();
   $("#forecastProjection").textContent=money(projected,true);
-  $("#forecastPct").textContent=pct(vsMeta);
+  $("#forecastPct").textContent=signedPct(diff);
   $("#forecastPct").className="forecast-value "+forecastClass(vsMeta);
+  $("#heroForecastProjection").textContent=money(projected,true);
+  $("#heroForecastScope").textContent=compactScopeLabel();
+  $("#heroForecastPct").textContent=signedPct(diff);
+  $("#heroForecastPct").className=forecastClass(vsMeta);
   $("#forecastGap").textContent=money(gap,true);
   $("#forecastGap").className="forecast-value "+forecastClass(vsMeta);
   $("#forecastMargin").textContent=c.margin.toFixed(2)+"%";
-  $("#forecastSummary").textContent=diff>=0
-    ? `Cierre estimado ${pct(diff)} arriba de meta`
-    : `Cierre estimado ${pct(Math.abs(diff))} debajo de meta`;
+  $("#forecastSummary").textContent=`Resultado estimado: ${signedPct(diff)} vs meta`;
   $("#forecastPctNote").textContent=diff>=0
-    ? `Sobrarían ${money(gap,true)} contra la meta.`
-    : `Faltarían ${money(Math.abs(gap),true)} contra la meta.`;
+    ? `Excedente estimado: ${money(gap,true)}.`
+    : `Faltante estimado: ${money(Math.abs(gap),true)}.`;
 
   const rows=projectionRows(arr).slice(0, storeFilter.value!=="TODAS" ? 8 : 10);
   const maxPct=Math.max(1.08,...rows.map(r=>r.pct))*1.04;
   $("#forecastBars").innerHTML=rows.map(r=>{
     const click = r.store ? `onclick='openStore(${JSON.stringify(r.store)})'` : r.group ? `onclick='selectGroup(${JSON.stringify(r.group)})'` : "";
-    const amountLabel = r.isChannel ? `Proy. ${money(r.amount,true)}` : `${r.amount>=0?"+":""}${money(r.amount,true)}`;
-    const metaText = r.isChannel ? "vs meta tienda" : "vs meta";
+    const amountLabel = r.isChannel ? `Cierre est. ${money(r.amount,true)}` : `${r.amount>=0?"+":""}${money(r.amount,true)}`;
+    const percentageLabel = r.isChannel ? pct(r.pct) : signedPct(r.pct-1);
+    const metaText = r.isAssignedChannel ? r.note : r.isChannel ? "de la meta de tienda" : "variación vs meta";
+    const valueClass = r.isChannel ? "" : forecastClass(r.pct);
+    const fillClass = r.isChannel ? "" : barClass(r.pct);
     return `<div class="forecast-row" ${click}>
       <div class="forecast-name">${r.name}</div>
       <div class="forecast-track">
-        <div class="forecast-fill ${barClass(r.pct)}" style="width:${Math.min(r.pct/maxPct*100,100)}%"></div>
+        <div class="forecast-fill ${fillClass}" style="width:${Math.min(r.pct/maxPct*100,100)}%"></div>
         <div class="forecast-marker" style="left:${Math.min(1/maxPct*100,100)}%"></div>
       </div>
-      <div class="forecast-meta ${forecastClass(r.pct)}">${pct(r.pct)}
+      <div class="forecast-meta ${valueClass}">${percentageLabel}
         <span>${amountLabel} · ${metaText}</span>
       </div>
     </div>`;
@@ -719,16 +882,16 @@ function renderPriorities(arr){
   const p=arr.map(storeMetrics).filter(x=>x.breach<0).sort((a,b)=>a.breach-b.breach).slice(0,3);
   const totalNegative=arr.map(storeMetrics).filter(x=>x.breach<0).reduce((a,s)=>a+Math.abs(s.breach),0);
   const pImpact=p.reduce((a,s)=>a+Math.abs(s.breach),0);
-  $("#prioritySummary").textContent=p.length ? `${pct(pImpact/totalNegative)} de la presión negativa` : "Sin focos críticos";
+  $("#prioritySummary").textContent=p.length ? `${pct(pImpact/totalNegative)} de la diferencia total` : "Sin focos críticos";
   $("#priorityGrid").innerHTML=p.map((s,i)=>`
     <article class="card priority" onclick='openStore(${JSON.stringify(s.store)})'>
       <div class="priority-top"><span class="rank">PRIORIDAD 0${i+1}</span><span class="badge">Intervenir</span></div>
       <div class="store">${s.store}</div>
       <div class="priority-main">
-        <div><div class="mini-label">Brecha al corte</div><div class="breach">${money(s.breach,true)}</div></div>
+        <div><div class="mini-label">Diferencia al corte</div><div class="breach">${money(s.breach,true)}</div></div>
         <div class="chev">›</div>
       </div>
-      <div class="priority-bottom"><span>Avance ${pct(s.progress)}</span><span>Necesita ${money(s.neededDaily,true)}/día</span></div>
+      <div class="priority-bottom"><span>Meta cubierta ${pct(s.progress)}</span><span>Venta diaria ${money(s.neededDaily,true)}</span></div>
     </article>`).join("") || `<div class="empty card">No hay tiendas debajo del ritmo esperado.</div>`;
 }
 function groupMetrics(){
@@ -743,65 +906,133 @@ function renderPulse(){
   $("#pulseList").innerHTML=list.map(g=>{
     const diff=g.progress-EXPECTED, cls=diff<0?"risk":"";
     return `<div class="pulse-row" onclick='selectGroup(${JSON.stringify(g.group)})'>
-      <div class="pulse-name">${g.group}</div>
+      <div class="pulse-name"><b>${g.group}</b><span class="pulse-detail">${money(g.sales,true)} vendido al corte · Meta ${money(g.goal,true)}</span></div>
       <div class="track">
         <div class="fill ${cls}" style="width:${Math.min(g.progress/maxProgress*100,100)}%"></div>
         <div class="marker" style="left:${Math.min(EXPECTED/maxProgress*100,100)}%"></div>
       </div>
       <div class="pulse-value ${statusClass(diff)}">${pct(g.progress)}
-        <span class="pulse-sub">${money(g.breach,true)}</span>
+        <span class="pulse-sub">Diferencia ${money(g.breach,true)} al corte</span>
       </div>
     </div>`;
   }).join("");
 }
-function selectGroup(g){filter.value=g;populateStores(false);render();window.scrollTo({top:0,behavior:"smooth"})}
+function renderWithMotion(){
+  document.body.classList.add("view-updating");
+  render();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.remove("view-updating")));
+}
+function selectGroup(g){filter.value=g;populateStores(false);renderWithMotion();window.scrollTo({top:0,behavior:"smooth"})}
+function normalizeChannelName(name){
+  const normalized=String(name||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim().toUpperCase();
+  return /^AGENTES?\s+LOCALES?$/.test(normalized) ? "AGENTE LOCAL" : normalized;
+}
+function canViewAssignedChannelGoals(s){
+  const hasTargets=Array.isArray(CHANNEL_TARGETS[s.store]) && CHANNEL_TARGETS[s.store].length>0;
+  const authorized=CURRENT_USER && (CURRENT_USER.role==="director" || CURRENT_USER.supervisor==="Alicia");
+  return hasTargets && authorized;
+}
+function assignedChannelGoalsMarkup(s){
+  if(!canViewAssignedChannelGoals(s)) return "";
+  const targets=CHANNEL_TARGETS[s.store];
+  const channels=new Map(s.channels.map(channel=>[normalizeChannelName(channel.name),channel]));
+  const targetKeys=new Set(targets.map(target=>normalizeChannelName(target.name)));
+  const rows=targets.map(target=>{
+    const actual=channels.get(normalizeChannelName(target.name)) || {sales:0,tickets:0,margin:0};
+    const progress=ratio(actual.sales,target.goal);
+    const remaining=Math.max(target.goal-actual.sales,0);
+    const excess=Math.max(actual.sales-target.goal,0);
+    const daily=DAYS_LEFT>0 ? remaining/DAYS_LEFT : 0;
+    const resultLabel=remaining>0 ? "Falta" : "Sobre meta";
+    const resultValue=remaining>0 ? money(remaining,true) : `+${money(excess,true)}`;
+    return `<article class="target-channel">
+      <div class="target-channel-head">
+        <div><div class="target-channel-name">${target.name}</div><div class="target-channel-sub">${actual.tickets.toLocaleString("es-MX")} tickets · Margen ${actual.margin.toFixed(2)}%</div></div>
+        <span class="target-share">${pct(target.share)} de la meta</span>
+      </div>
+      <div class="target-channel-progress"><span class="${progress>=1?"met":""}" style="width:${Math.min(progress*100,100)}%"></span></div>
+      <div class="target-channel-metrics">
+        <div><small>Meta asignada</small><strong>${money(target.goal,true)}</strong></div>
+        <div><small>Venta al corte</small><strong>${money(actual.sales,true)}</strong></div>
+        <div><small>${resultLabel}</small><strong class="${remaining>0?statusClass(progress-EXPECTED):"pos"}">${resultValue}</strong></div>
+        <div><small>Venta diaria requerida</small><strong>${DAYS_LEFT>0?money(daily,true):"—"}</strong></div>
+      </div>
+    </article>`;
+  }).join("");
+  const unassigned=s.channels.filter(channel=>!targetKeys.has(normalizeChannelName(channel.name)) && channel.sales>0);
+  const unassignedSales=unassigned.reduce((total,channel)=>total+channel.sales,0);
+  const note=unassigned.length
+    ? `<div class="target-note"><b>${unassigned.map(channel=>channel.name).join(", ")}</b>: ${money(unassignedSales,true)} vendidos. Esta venta cuenta en la meta total de la tienda, pero el Excel no le asigna una meta de canal propia.</div>`
+    : "";
+  return `<div class="channel-title">Metas asignadas por canal <span class="target-source">Fuente: Excel</span></div>
+    <div class="channel-caption">Distribución mensual definida para esta tienda. Se muestra cuánto lleva cada canal, cuánto falta y la venta diaria requerida.</div>
+    <div class="target-list">${rows}</div>${note}`;
+}
+function projectedChannelsMarkup(s){
+  if(s.channels.length<=1) return "";
+  return `<div class="channel-title">Aportación estimada por canal</div>
+    <div class="channel-caption">Proyección de cierre de cada canal y su contribución a la meta mensual; no representa una meta asignada.</div>
+    ${s.channels.map(c=>{
+      const cp=DAYS_ELAPSED>0 ? c.sales/DAYS_ELAPSED*DAYS_MONTH : 0;
+      const cpct=ratio(cp,s.goal);
+      return `<div class="channel"><div><b>${c.name}</b><br><span>${c.tickets.toLocaleString("es-MX")} tickets · Margen ${c.margin.toFixed(2)}% · Aportación estimada ${pct(cpct)}</span></div><b>Cierre est. ${money(cp,true)}</b></div>`;
+    }).join("")}`;
+}
+function channelSectionMarkup(s){
+  return canViewAssignedChannelGoals(s) ? assignedChannelGoalsMarkup(s) : projectedChannelsMarkup(s);
+}
+let LAST_FOCUSED=null;
+function showDrawer(focusSelector=".close"){
+  const overlay=$("#overlay");
+  if(!overlay.classList.contains("open")) LAST_FOCUSED=document.activeElement;
+  overlay.classList.add("open");
+  document.body.classList.add("drawer-open");
+  requestAnimationFrame(()=>{const target=$(focusSelector);if(target)target.focus()});
+}
 function openStore(name){
-  const s=storeMetrics(STORES.find(x=>x.store===name));
+  const selected=STORES.find(x=>x.store===name);
+  if(!selected) return;
+  const s=storeMetrics(selected);
   const diff=s.progress-EXPECTED;
+  const remaining=Math.max(s.goal-s.sales,0);
   const action = diff>=0
-    ? `Mantener ejecución. La tienda está ${pct(diff)} arriba del ritmo esperado.`
-    : `Recuperar ${money(Math.abs(s.breach),true)} de brecha. El ritmo diario debe subir de ${money(s.currentDaily,true)} a ${money(s.neededDaily,true)}.`;
+    ? `Mantener el ritmo actual. La tienda está ${pp(diff)} arriba del avance esperado y le faltan ${money(remaining,true)} para completar la meta.`
+    : `Cerrar una diferencia de ${money(Math.abs(s.breach),true)} al corte. Para alcanzar la meta, la venta diaria debe pasar de ${money(s.currentDaily,true)} a ${money(s.neededDaily,true)}.`;
   $("#drawer").innerHTML=`
     <div class="drawer-head">
       <div><div class="drawer-group">${s.group}</div><h3>${s.store}</h3></div>
-      <button class="close" onclick="closeDrawer()">×</button>
+      <button class="close" onclick="closeDrawer()" aria-label="Cerrar detalle">×</button>
     </div>
     <div class="drawer-hero">
-      <div class="mini-label">Venta acumulada</div>
+      <div class="mini-label">Venta al corte</div>
       <div class="drawer-money">${money(s.sales,true)}</div>
       <div class="drawer-progress"><span style="width:${Math.min(s.progress*100,100)}%"></span></div>
       <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:12px">
-        <span>${pct(s.progress)} de avance</span><span>Meta ${money(s.goal,true)}</span>
+        <span>${attainmentLabel(s.progress)}</span><span>Meta mensual ${money(s.goal,true)}</span>
       </div>
     </div>
     <div class="drawer-kpis">
-      <div class="dk"><small>Brecha al corte</small><strong class="${statusClass(diff)}">${money(s.breach,true)}</strong></div>
-      <div class="dk"><small>Ritmo necesario</small><strong>${money(s.neededDaily,true)}/día</strong></div>
-      <div class="dk"><small>Proyección cierre</small><strong>${money(s.projection,true)}</strong></div>
-      <div class="dk"><small>Cierre vs meta</small><strong class="${forecastClass(s.projectionPct)}">${pct(s.projectionPct)}</strong></div>
-      <div class="dk"><small>Gap proyectado</small><strong class="${forecastClass(s.projectionPct)}">${money(s.projectionGap,true)}</strong></div>
+      <div class="dk"><small>Falta para meta</small><strong class="${remaining>0?"warn":"pos"}">${money(remaining,true)}</strong></div>
+      <div class="dk"><small>Diferencia al corte</small><strong class="${statusClass(diff)}">${money(s.breach,true)}</strong></div>
+      <div class="dk"><small>Venta diaria requerida</small><strong>${money(s.neededDaily,true)}</strong></div>
+      <div class="dk"><small>Venta estimada al cierre</small><strong>${money(s.projection,true)}</strong></div>
+      <div class="dk"><small>Resultado estimado vs meta</small><strong class="${forecastClass(s.projectionPct)}">${signedPct(s.projectionPct-1)}</strong></div>
+      <div class="dk"><small>Diferencia estimada</small><strong class="${forecastClass(s.projectionPct)}">${money(s.projectionGap,true)}</strong></div>
       <div class="dk"><small>Ticket promedio</small><strong>${money(s.avgTicket)}</strong></div>
       <div class="dk"><small>Tickets</small><strong>${s.tickets.toLocaleString("es-MX")}</strong></div>
       <div class="dk"><small>Margen</small><strong>${s.margin.toFixed(2)}%</strong></div>
     </div>
-    <div class="action-box"><b>Lectura operativa:</b><br>${action}</div>
-    ${s.channels.length>1?`
-      <div class="channel-title">Composición por canal</div>
-      ${s.channels.map(c=>{
-        const cp=c.sales/DAYS_ELAPSED*DAYS_MONTH;
-        const cpct=s.goal ? cp/s.goal : 0;
-        return `<div class="channel"><div><b>${c.name}</b><br><span>${c.tickets.toLocaleString("es-MX")} tickets · margen ${c.margin.toFixed(2)}% · cierre ${pct(cpct)} meta tienda</span></div><b>${money(cp,true)}</b></div>`;
-      }).join("")}
-    `:""}
+    <div class="action-box"><b>Acción recomendada:</b><br>${action}</div>
+    ${channelSectionMarkup(s)}
   `;
-  $("#overlay").classList.add("open");
+  showDrawer();
 }
 function openExplorer(){
   const arr=groupSubset().slice().sort((a,b)=>a.store.localeCompare(b.store));
   $("#drawer").innerHTML=`
     <div class="drawer-head">
       <div><div class="drawer-group">Explorador</div><h3>Selecciona una tienda</h3></div>
-      <button class="close" onclick="closeDrawer()">×</button>
+      <button class="close" onclick="closeDrawer()" aria-label="Cerrar explorador">×</button>
     </div>
     <input class="searchbox" id="storeSearch" placeholder="Buscar tienda…" autocomplete="off">
     <div class="store-list" id="storeList"></div>`;
@@ -811,22 +1042,58 @@ function openExplorer(){
     const r=arr.filter(s=>s.store.toLowerCase().includes(q));
     list.innerHTML=r.map(s=>{
       const m=storeMetrics(s);
-      return `<div class="store-option" onclick='openStore(${JSON.stringify(s.store)})'><b>${s.store}</b><span>${s.group} · avance ${pct(m.progress)} · cierre ${pct(m.projectionPct)} meta · gap ${money(m.projectionGap,true)}</span></div>`
+      return `<div class="store-option" onclick='openStore(${JSON.stringify(s.store)})'><b>${s.store}</b><span>${s.group} · Meta cubierta ${pct(m.progress)} · Cierre estimado ${signedPct(m.projectionPct-1)} vs meta · Diferencia ${money(m.projectionGap,true)}</span></div>`
     }).join("") || `<div class="empty">No se encontraron tiendas.</div>`;
   }
   input.addEventListener("input",paint);paint();
-  $("#overlay").classList.add("open");setTimeout(()=>input.focus(),80);
+  showDrawer("#storeSearch");
 }
-function closeDrawer(){ $("#overlay").classList.remove("open") }
+function closeDrawer(){
+  $("#overlay").classList.remove("open");
+  document.body.classList.remove("drawer-open");
+  if(LAST_FOCUSED && LAST_FOCUSED.isConnected) LAST_FOCUSED.focus();
+  LAST_FOCUSED=null;
+}
+function setActiveNav(target){
+  document.querySelectorAll(".mobile-nav [data-nav],.section-nav [data-nav]").forEach(item=>item.classList.toggle("active",item.dataset.nav===target));
+}
+function setupNavigation(){
+  if(document.body.dataset.navigationReady==="true") return;
+  document.body.dataset.navigationReady="true";
+  const links=[...document.querySelectorAll('.mobile-nav a[data-nav],.section-nav a[data-nav]')];
+  links.forEach(link=>link.addEventListener("click",()=>setActiveNav(link.dataset.nav)));
+  if(!("IntersectionObserver" in window)) return;
+  const observer=new IntersectionObserver(entries=>{
+    const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+    if(visible) setActiveNav(visible.target.id);
+  },{rootMargin:"-24% 0px -58% 0px",threshold:[.08,.25,.5]});
+  ["resumen","proyeccion","prioridades","grupos"].forEach(id=>{const section=document.getElementById(id);if(section)observer.observe(section)});
+}
+function setupSectionMotion(){
+  if(document.body.dataset.motionReady==="true" || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.body.dataset.motionReady="true";
+  document.body.classList.add("motion-ready");
+  const sections=[...document.querySelectorAll("main>section")];
+  if(!("IntersectionObserver" in window)){
+    sections.forEach(section=>section.classList.add("in-view"));
+    return;
+  }
+  const revealObserver=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("in-view");revealObserver.unobserve(entry.target)}});
+  },{rootMargin:"0px 0px -8% 0px",threshold:.06});
+  sections.forEach(section=>revealObserver.observe(section));
+}
 if($("#supervisorFilter")) $("#supervisorFilter").addEventListener("change",()=>{applyScope();window.scrollTo({top:0,behavior:"smooth"});});
-filter.addEventListener("change",()=>{populateStores(false);render();});
-storeFilter.addEventListener("change",render);
+filter.addEventListener("change",()=>{populateStores(false);renderWithMotion();});
+storeFilter.addEventListener("change",renderWithMotion);
 $("#exploreBtn").addEventListener("click",openExplorer);
+$("#mobileExploreBtn").addEventListener("click",()=>{setActiveNav("tiendas");openExplorer()});
+$("#heroForecastBtn").addEventListener("click",()=>{$("#proyeccion").scrollIntoView({behavior:"smooth",block:"start"});setActiveNav("proyeccion")});
 $("#logoutBtn").addEventListener("click",logout);
 $("#overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeDrawer()});
 $("#diagToggle").addEventListener("click",()=>{
   $("#diagnostic").classList.toggle("show");
-  $("#diagToggle").textContent=$("#diagnostic").classList.contains("show")?"Ocultar diagnóstico":"Ver diagnóstico comercial";
+  $("#diagToggle").textContent=$("#diagnostic").classList.contains("show")?"Ocultar indicadores":"Ver indicadores complementarios";
 });
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer()});
 initLogin();
